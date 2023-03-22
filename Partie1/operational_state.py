@@ -6,5 +6,3 @@ class OperationalState(Enum):
     IDLE = auto()
     RUNNING = auto()
     TERMINAL_REACHED = auto()
-
-
