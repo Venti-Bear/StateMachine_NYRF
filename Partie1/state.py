@@ -13,6 +13,7 @@ class Parameters:
 
 class State:
     """todo"""
+
     def __init__(self, parameters: Optional[Parameters] = Parameters()):
         self.__transition: List[Transition] = []
         self.__parameters: Parameters = parameters

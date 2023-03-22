@@ -16,8 +16,8 @@ class Layout:
     def add_state(self, state: State) -> None:
         self.__states.add(state)
 
-    def add_states(self, stats: Set[State]) -> None:
-        self.__states = self.__states.union(stats)
+    def add_states(self, states: Set[State]) -> None:
+        self.__states = self.__states.union(states)
 
     @property
     def initial_state(self) -> Optional[State]:

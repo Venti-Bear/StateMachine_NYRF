@@ -26,6 +26,7 @@ class FiniteStateMachine:
     def reset(self):
         """sets the operational state to IDLE"""
         self.__current_operationnal_state = OperationalState.IDLE
+        self.current_applicative_state = self.__layout.initial_state
 
     def _transit_by(self, transition: Transition):
         self.current_applicative_state._exec_exiting_action()
@@ -39,11 +40,19 @@ class FiniteStateMachine:
         self.current_applicative_state._exec_entering_action()
 
     def track(self) -> bool:
+        # if self.current_applicative_state == OperationalState.IDLE:
+        #     return False
         if self.__current_operationnal_state == OperationalState.TERMINAL_REACHED:
             return False
         return True
 
     def run(self, reset: bool = True, time_budget: float = None):
+        self.__current_operationnal_state = OperationalState.RUNNING
+        
+        # if reset:
+        #     self.__current_operationnal_state = OperationalState.TERMINAL_REACHED
+        #     self.reset()
+        
         cur_time = perf_counter()
         prev_time = cur_time
 
@@ -56,10 +65,7 @@ class FiniteStateMachine:
 
             if time_budget is not None:
                 if elapsed_time >= time_budget:
-                    self.__current_operationnal_state = OperationalState.IDLE
-
-        if reset:
-            self.__current_operationnal_state = OperationalState.TERMINAL_REACHED
+                    self.stop()
 
     def stop(self):
         if self.__current_operationnal_state == OperationalState.RUNNING:
