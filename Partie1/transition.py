@@ -25,7 +25,7 @@ class Transition(ABC):
         raise NotImplementedError
 
     def _exec_transiting_action(self):
-        pass
+        self._do_transiting_action()
 
     def _do_transiting_action(self):
         pass

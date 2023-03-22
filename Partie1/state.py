@@ -12,12 +12,7 @@ class Parameters:
 
 
 class State:
-    """Form a complex number.
-
-    Keyword arguments:
-    real -- the real part (default 0.0)
-    imag -- the imaginary part (default 0.0)
-    """
+    """todo"""
     def __init__(self, parameters: Optional[Parameters] = Parameters()):
         self.__transition: List[Transition] = []
         self.__parameters: Parameters = parameters
