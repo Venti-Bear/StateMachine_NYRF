@@ -19,8 +19,8 @@ class Transition(ABC):
     def next_state(self, next_state: Optional[State]):
         self.__next_state = next_state
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def is_transiting(self) -> bool:
         raise NotImplementedError
 
