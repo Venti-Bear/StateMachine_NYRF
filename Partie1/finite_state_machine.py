@@ -11,8 +11,7 @@ class FiniteStateMachine:
 
     def __init__(self, layout: Layout, uninitialized: bool = True):
         self.__layout = layout
-        self.__uninitialized = uninitialized
-        self.__current_applicative_state = self.__layout.initial_state
+        self.__current_applicative_state = None if uninitialized else self.__layout.initial_state
         self.__current_operational_state = OperationalState.UNINITIALIZED
 
     @property
