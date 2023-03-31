@@ -9,6 +9,7 @@ from time import perf_counter
 class FiniteStateMachine:
     """todo"""
 
+    # Demander à JC uninitialized
     def __init__(self, layout: Layout, uninitialized: bool = True):
         self.__layout = layout
         self.__current_applicative_state = None if uninitialized else self.__layout.initial_state
