@@ -135,4 +135,5 @@ class AllConditions(ManyConditions):
         super().__init__(inverse)
 
     def compare(self) -> bool:
-        return 
+        return
+    
