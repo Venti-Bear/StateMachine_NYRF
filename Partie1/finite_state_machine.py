@@ -16,8 +16,11 @@ class FiniteStateMachine:
             raise TypeError('layout must be of type Layout')
 
         self.__layout = layout
-        self.__current_applicative_state = None if uninitialized else self.__layout.initial_state
-        self.__current_operational_state = OperationalState.UNINITIALIZED if uninitialized else OperationalState.IDLE
+        if uninitialized:
+            self.current_applicative_state = None
+            self.__current_operational_state = OperationalState.UNINITIALIZED
+        else:
+            self.reset()
 
     @property
     def current_operational_state(self) -> OperationalState:
@@ -31,6 +34,7 @@ class FiniteStateMachine:
         """sets the operational state to IDLE"""
         self.__current_operational_state = OperationalState.IDLE
         self.__current_applicative_state = self.__layout.initial_state
+        self.current_applicative_state._exec_entering_action()
 
     def _transit_by(self, transition: Transition):
         if not isinstance(transition, Transition):
