@@ -14,10 +14,17 @@ class Layout:
         return all((state.is_valid() for state in self.__states))
 
     def add_state(self, state: State) -> None:
+        if not isinstance(state, State):
+            raise TypeError('state must be of type State')
+
         self.__states.add(state)
 
-    def add_states(self, stats: Set[State]) -> None:
-        self.__states = self.__states.union(stats)
+    def add_states(self, states: Set[State]) -> None:
+        for state in states:
+            if not isinstance(state, State):
+                raise TypeError('state must be of type State')
+
+        self.__states = self.__states.union(states)
 
     @property
     def initial_state(self) -> Optional[State]:
@@ -27,5 +34,6 @@ class Layout:
     def initial_state(self, state) -> None:
 
         if state not in self.__states:
-            raise Exception("the initial state must be part of the Layout states")
+            raise Exception(
+                "the initial state must be part of the Layout states")
         self.__initial_state = state

@@ -1,3 +1,4 @@
+from types import NoneType
 from layout import Layout
 from operational_state import OperationalState
 from state import State
@@ -7,51 +8,88 @@ from time import perf_counter
 
 
 class FiniteStateMachine:
-    def __init__(self, layout, uninitialized: bool = True):
+    """todo"""
+
+    # Demander à JC uninitialized
+    def __init__(self, layout: Layout, uninitialized: bool = True):
+        if not isinstance(layout, Layout):
+            raise TypeError('layout must be of type Layout')
+
         self.__layout = layout
-        self.__uninitialized = uninitialized
-        self.__current_applicative_state = None  # HUH?
-        self.__current_operationnal_state = OperationalState.UNINITIALIZED
+        if uninitialized:
+            self.current_applicative_state = None
+            self.__current_operational_state = OperationalState.UNINITIALIZED
+        else:
+            self.reset()
 
     @property
-    def current_operational_state(self):
-        return self.__current_operationnal_state
+    def current_operational_state(self) -> OperationalState:
+        return self.__current_operational_state
 
     @property
     def current_applicative_state(self):
         return self.__current_applicative_state
 
     def reset(self):
-        self.__current_operationnal_state = OperationalState.IDLE
+        """sets the operational state to IDLE"""
+        self.__current_operational_state = OperationalState.IDLE
+        self.__current_applicative_state = self.__layout.initial_state
+        self.current_applicative_state._exec_entering_action()
 
     def _transit_by(self, transition: Transition):
-        pass
+        if not isinstance(transition, Transition):
+            raise TypeError('transition must be of type Transition')
+
+        self.current_applicative_state._exec_exiting_action()
+        transition._exec_transiting_action()
+        self.__current_applicative_state = transition.next_state
+        self.current_applicative_state._exec_entering_action()
 
     def transit_to(self, state: State):
-        pass
+        if not isinstance(state, State):
+            raise TypeError('state must be of type State')
+
+        self.current_applicative_state._exec_exiting_action()
+        self.__current_applicative_state = state
+        self.current_applicative_state._exec_entering_action()
 
     def track(self) -> bool:
-        if self.__current_operationnal_state == OperationalState.TERMINAL_REACHED:
+        if self.current_applicative_state.is_terminal:
+            self.__current_operational_state = OperationalState.TERMINAL_REACHED
             return False
+
+        transition = self.current_applicative_state.is_transiting
+        if transition is not None:
+            self._transit_by(transition)
+        else:
+            self.current_applicative_state._exec_in_state_action()
+
         return True
 
     def run(self, reset: bool = True, time_budget: float = None):
+        if not isinstance(reset, bool):
+            raise TypeError('reset must be of type bool')
+        if not isinstance(time_budget, (float, NoneType)):
+            raise TypeError('time_budget must be of type float')
+
+        self.__current_operational_state = OperationalState.RUNNING
+
+        if reset:
+            self.reset()
+
         cur_time = perf_counter()
         prev_time = cur_time
 
-        while self.__current_operationnal_state == OperationalState.RUNNING:
-            self.track()
-
+        while self.track():
             cur_time = perf_counter()
             elapsed_time = cur_time - prev_time
             prev_time = cur_time
 
             if time_budget is not None:
                 if elapsed_time >= time_budget:
-                    self.__current_operationnal_state = OperationalState.IDLE
-            # if reset:
-            #     self.__current_operationnal_state = OperationalState.IDLE
+                    self.stop()
+                    break
 
     def stop(self):
-        if self.__current_operationnal_state == OperationalState.RUNNING:
-            self.__current_operationnal_state = OperationalState.IDLE
+        if self.__current_operational_state == OperationalState.RUNNING:
+            self.__current_operational_state = OperationalState.IDLE
