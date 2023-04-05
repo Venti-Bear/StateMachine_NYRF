@@ -32,7 +32,7 @@ class TrafficLightTransition(Transition):
     def is_transiting(self) -> bool:
         if self.__start_time is None:
             self.__start_time = perf_counter()
-        
+
         if perf_counter() - self.__start_time > self.__target_time:
             self.__start_time = None
             return True

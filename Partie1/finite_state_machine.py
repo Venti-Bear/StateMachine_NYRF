@@ -1,3 +1,4 @@
+from types import NoneType
 from layout import Layout
 from operational_state import OperationalState
 from state import State
@@ -11,6 +12,9 @@ class FiniteStateMachine:
 
     # Demander à JC uninitialized
     def __init__(self, layout: Layout, uninitialized: bool = True):
+        if not isinstance(layout, Layout):
+            raise TypeError('layout must be of type Layout')
+
         self.__layout = layout
         self.__current_applicative_state = None if uninitialized else self.__layout.initial_state
         self.__current_operational_state = OperationalState.UNINITIALIZED if uninitialized else OperationalState.IDLE
@@ -29,12 +33,18 @@ class FiniteStateMachine:
         self.__current_applicative_state = self.__layout.initial_state
 
     def _transit_by(self, transition: Transition):
+        if not isinstance(transition, Transition):
+            raise TypeError('transition must be of type Transition')
+
         self.current_applicative_state._exec_exiting_action()
         transition._exec_transiting_action()
         self.__current_applicative_state = transition.next_state
         self.current_applicative_state._exec_entering_action()
 
     def transit_to(self, state: State):
+        if not isinstance(state, State):
+            raise TypeError('state must be of type State')
+
         self.current_applicative_state._exec_exiting_action()
         self.__current_applicative_state = state
         self.current_applicative_state._exec_entering_action()
@@ -49,10 +59,15 @@ class FiniteStateMachine:
             self._transit_by(transition)
         else:
             self.current_applicative_state._exec_in_state_action()
-        
+
         return True
 
     def run(self, reset: bool = True, time_budget: float = None):
+        if not isinstance(reset, bool):
+            raise TypeError('reset must be of type bool')
+        if not isinstance(time_budget, (float, NoneType)):
+            raise TypeError('time_budget must be of type float')
+
         self.__current_operational_state = OperationalState.RUNNING
 
         if reset:

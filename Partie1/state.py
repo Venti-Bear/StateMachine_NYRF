@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import Optional, List, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from transition import Transition
+
 
 class Parameters:
     def __init__(self):
@@ -13,7 +16,7 @@ class State:
     """todo"""
 
     def __init__(self, parameters: Optional[Parameters] = Parameters()):
-        self.__transition: List['Transition'] = []
+        self.__transition: List[Transition] = []
         self.__parameters: Parameters = parameters
 
     @property
@@ -36,7 +39,7 @@ class State:
             if transition.is_transiting:
                 return transition
 
-    def add_transition(self, transition: 'Transition'):
+    def add_transition(self, transition: Transition):
         """todo"""
         self.__transition.append(transition)
 
