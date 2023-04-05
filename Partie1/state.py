@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, List, TYPE_CHECKING
+from typing import Callable, Optional, List, TYPE_CHECKING
 import time
 
 if TYPE_CHECKING:
