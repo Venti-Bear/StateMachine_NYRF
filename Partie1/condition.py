@@ -76,8 +76,8 @@ class StateEntryDurationCondition(MonitoredStateCondition):
         self.__duration: float = duration
 
     @property
-    def duration(self) -> MonitoredState:
-        return self.__monitored_state
+    def duration(self) -> float:
+        return self.__duration
 
     @duration.setter
     def duration(self, duration) -> None:
