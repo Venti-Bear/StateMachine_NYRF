@@ -37,10 +37,9 @@ class Transition(ABC):
         self._do_transiting_action()
 
     def _do_transiting_action(self):
-        pass
+        ...
 
 
-# TYPE HINTING À FAIRE
 class ConditionalTransition(Transition):
     def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None):
         super().__init__(next_state)
@@ -51,7 +50,7 @@ class ConditionalTransition(Transition):
         self.__condition: Optional[Condition] = condition
 
     def is_valid(self) -> bool:
-        return super.is_valid() and self.__condition is not None
+        return super().is_valid() and self.__condition is not None
 
     @property
     def condition(self):
@@ -69,7 +68,7 @@ class ConditionalTransition(Transition):
 class ActionTransition(ConditionalTransition):
     def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None):
         super().__init__(next_state, condition)
-        self.__transiting_actions = list[Callable[[], None]]
+        self.__transiting_actions: list[Callable[[], None]] = []
         
     def _do_transiting_action(self):
         for action in self.__transiting_actions:
