@@ -14,6 +14,7 @@ class Transition(ABC):
 
         self.__next_state: Optional[State] = next_state
 
+    @property
     def is_valid(self) -> bool:
         return self.__next_state is not None
 
