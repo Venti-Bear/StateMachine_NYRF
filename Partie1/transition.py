@@ -1,9 +1,10 @@
 from abc import ABC
 import abc
-from argparse import Action
+import time
 from types import NoneType
 from typing import Callable, Optional
 from state import State
+from condition import Condition
 
 
 class Transition(ABC):
@@ -41,8 +42,12 @@ class Transition(ABC):
 
 # TYPE HINTING À FAIRE
 class ConditionalTransition(Transition):
-    def __init__(self, next_state: Optional[State] = None, condition=None):
+    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None):
         super().__init__(next_state)
+        
+        if not isinstance(condition, (Condition, NoneType)):
+            raise TypeError('condition must be of type Condition')
+        
         self.__condition = condition
 
     def is_valid(self) -> bool:
@@ -58,27 +63,28 @@ class ConditionalTransition(Transition):
 
     def is_transiting(self) -> bool:
         """todo"""
-        return super().is_transiting
+        return bool(self.__condition)
 
 
 class ActionTransition(ConditionalTransition):
-    def __init__(self, next_state: Optional[State] = None, condition=None):
+    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None):
         super().__init__(next_state, condition)
         self.__transiting_actions = list[Callable[[], None]]
         
     def _do_transiting_action(self):
-        return super()._do_transiting_action()
+        for action in self.__transiting_actions:
+            action()
     
     def add_transition_action(self, action: Callable[[], None]) -> None:
         self.__transiting_actions.append(action)
 
 
 class MonitoredTransition(ActionTransition):
-    def __init__(self, next_state: Optional[State] = None, condition=None):
+    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None):
         super().__init__(next_state, condition)
         self.__transit_count = 0
         self.__last_transit_time = 0.
-        self.custom_value = any
+        self.custom_value = None
         
     @property
     def transit_count(self) -> int:
@@ -92,7 +98,9 @@ class MonitoredTransition(ActionTransition):
         self.__transit_count = 0
         
     def reset_last_transit_time(self) -> None:
-        self.__last_transit_time = 0
+        self.__last_transit_time = 0.
         
     def _exec_transiting_action(self):
+        self.__transit_count += 1
+        self.__last_transit_time = time.perf_counter()
         return super()._exec_transiting_action()
