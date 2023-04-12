@@ -12,7 +12,7 @@ class Transition(ABC):
         if not isinstance(next_state, (State, NoneType)):
             raise TypeError('next_state must be of type State')
 
-        self.__next_state: State = next_state
+        self.__next_state: Optional[State] = next_state
 
     def is_valid(self) -> bool:
         return self.__next_state is not None
@@ -48,7 +48,7 @@ class ConditionalTransition(Transition):
         if not isinstance(condition, (Condition, NoneType)):
             raise TypeError('condition must be of type Condition')
         
-        self.__condition = condition
+        self.__condition: Optional[Condition] = condition
 
     def is_valid(self) -> bool:
         return super.is_valid() and self.__condition is not None
