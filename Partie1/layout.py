@@ -11,7 +11,7 @@ class Layout:
         if self.initial_state is None:
             return False
 
-        return all((state.is_valid() for state in self.__states))
+        return all((state.is_valid for state in self.__states))
 
     def add_state(self, state: State) -> None:
         if not isinstance(state, State):

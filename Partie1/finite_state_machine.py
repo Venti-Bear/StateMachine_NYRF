@@ -17,7 +17,7 @@ class FiniteStateMachine:
 
         self.__layout = layout
         if uninitialized:
-            self.current_applicative_state = None
+            self.__current_applicative_state = None
             self.__current_operational_state = OperationalState.UNINITIALIZED
         else:
             self.reset()

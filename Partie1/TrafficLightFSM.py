@@ -1,6 +1,4 @@
-from ast import Param
-from base64 import encode
-from time import perf_counter, sleep
+from time import perf_counter
 from typing import Optional
 from state import Parameters, State
 from finite_state_machine import FiniteStateMachine
