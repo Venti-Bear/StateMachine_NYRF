@@ -77,13 +77,11 @@ class FiniteStateMachine:
         if reset:
             self.reset()
 
-        cur_time = perf_counter()
-        prev_time = cur_time
+        start_time = perf_counter()
 
         while self.track():
             cur_time = perf_counter()
-            elapsed_time = cur_time - prev_time
-            prev_time = cur_time
+            elapsed_time = cur_time - start_time
 
             if time_budget is not None:
                 if elapsed_time >= time_budget:
