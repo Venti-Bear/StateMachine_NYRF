@@ -28,7 +28,7 @@ class TestConditions(unittest.TestCase):
 
     def test_state_entry_duration_condition(self):
         monitored_state = MonitoredState()
-        monitored_state.custom_value = "value"
+        monitored_state._exec_entering_action()
         duration = 0.1
         entry_duration_cond = StateEntryDurationCondition(duration, monitored_state)
         self.assertFalse(entry_duration_cond)
@@ -38,10 +38,9 @@ class TestConditions(unittest.TestCase):
 
     def test_state_entry_count_condition(self):
         monitored_state = MonitoredState()
-        monitored_state.custom_value = "value"
-        entry_count_cond = StateEntryCountCondition(2, monitored_state)
+        entry_count_cond = StateEntryCountCondition(1, monitored_state)
         self.assertFalse(entry_count_cond)
-        entry_count_cond._monitored_state._MonitoredState__entry_count = 2
+        monitored_state._exec_entering_action()
         # monitored_state.update_entry_count()
         self.assertTrue(entry_count_cond)
 

@@ -88,7 +88,7 @@ class StateEntryDurationCondition(MonitoredStateCondition):
         self.__duration = duration
 
     def compare(self) -> bool:
-        return self.__duration > time.perf_counter() - self._monitored_state.last_entry_time
+        return self.__duration < time.perf_counter() - self._monitored_state.last_entry_time
 
 
 class StateEntryCountCondition(MonitoredStateCondition):
