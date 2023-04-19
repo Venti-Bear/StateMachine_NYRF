@@ -17,7 +17,7 @@ class TrafficLightState(State):
         self.text = text
 
     def _do_in_state_action(self):
-        print(f'\r{self.text}              ', end='')
+        print(f'\r{self.text}', end='   ')
 
 
 class TrafficLightTransition(Transition):
