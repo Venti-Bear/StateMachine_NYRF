@@ -39,7 +39,11 @@ class TimedCondition(Condition):
     def __init__(self, duration: float = 1.0, time_reference: Optional[float] = None, inverse: bool = False):
         super().__init__(inverse)
         self.__duration = duration
-        self.__time_reference = time_reference
+
+        if time_reference is None:
+            self.__time_reference = time.perf_counter()
+        else:
+            self.__time_reference = time_reference
 
     @property
     def duration(self) -> float:
@@ -59,15 +63,15 @@ class TimedCondition(Condition):
 class MonitoredStateCondition(Condition, ABC):
     def __init__(self, monitored_state: MonitoredState, inverse: bool = False):
         super().__init__(inverse)
-        self.__monitored_state: MonitoredState = monitored_state
+        self._monitored_state: MonitoredState = monitored_state
 
     @property
     def monitored_state(self) -> MonitoredState:
-        return self.__monitored_state
+        return self._monitored_state
 
     @monitored_state.setter
     def monitored_state(self, value) -> None:
-        self.__monitored_state = value
+        self._monitored_state = value
 
 
 class StateEntryDurationCondition(MonitoredStateCondition):
@@ -84,7 +88,7 @@ class StateEntryDurationCondition(MonitoredStateCondition):
         self.__duration = duration
 
     def compare(self) -> bool:
-        return self.__duration > time.perf_counter() - self.__monitored_state.last_entry_time
+        return self.__duration > time.perf_counter() - self._monitored_state.last_entry_time
 
 
 class StateEntryCountCondition(MonitoredStateCondition):
@@ -95,18 +99,18 @@ class StateEntryCountCondition(MonitoredStateCondition):
         self.__expected_count: int = expected_count
 
     def compare(self) -> bool:
-        if self.__expected_count >= self.__monitored_state.entry_count:
+        if self.__expected_count <= self._monitored_state.entry_count:
             if self.__auto_reset:
                 self.reset_count()
             return True
         return False
 
     def reset_count(self) -> None:
-        self.__monitored_state.reset_entry_count()
+        self._monitored_state.reset_entry_count()
 
 
 class StateValueCondition(MonitoredStateCondition):
-    def __init__(self, expected_value: None, monitored_state: MonitoredState, inverse: bool = False):
+    def __init__(self, expected_value: any, monitored_state: MonitoredState, inverse: bool = False):
         super().__init__(monitored_state, inverse)
         self.__expected_value: None = expected_value
 
@@ -119,7 +123,7 @@ class StateValueCondition(MonitoredStateCondition):
         self.__expected_value = value
 
     def compare(self) -> bool:
-        return self.__expected_value == self.__monitored_state.custom_value
+        return self.__expected_value == self._monitored_state.custom_value
 
 
 class ManyConditions(Condition, ABC):

@@ -51,7 +51,7 @@ class ConditionalTransition(Transition):
         self.__condition: Optional[Condition] = condition
 
     def is_valid(self) -> bool:
-        return super().is_valid() and self.__condition is not None
+        return super().is_valid and self.__condition is not None
 
     @property
     def condition(self):
