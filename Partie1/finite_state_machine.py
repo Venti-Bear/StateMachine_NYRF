@@ -1,4 +1,8 @@
 from types import NoneType
+from typing import Optional
+
+from Partie1.layout import Layout
+from Partie1.operational_state import OperationalState
 from layout import Layout
 from operational_state import OperationalState
 from state import State
@@ -9,9 +13,11 @@ from time import perf_counter
 
 class FiniteStateMachine:
     """todo"""
+    __current_operational_state: OperationalState
+    __current_applicative_state: Optional[State]
+    __layout: Layout
 
-    # Demander à JC uninitialized
-    def __init__(self, layout: Layout, uninitialized: bool = True):
+    def __init__(self, layout: Layout, uninitialized: bool = True) -> None:
         if not isinstance(layout, Layout):
             raise TypeError('layout must be of type Layout')
 
@@ -27,16 +33,16 @@ class FiniteStateMachine:
         return self.__current_operational_state
 
     @property
-    def current_applicative_state(self):
+    def current_applicative_state(self) -> State:
         return self.__current_applicative_state
 
-    def reset(self):
+    def reset(self) -> None:
         """sets the operational state to IDLE"""
         self.__current_operational_state = OperationalState.IDLE
         self.__current_applicative_state = self.__layout.initial_state
         self.current_applicative_state._exec_entering_action()
 
-    def _transit_by(self, transition: Transition):
+    def _transit_by(self, transition: Transition) -> None:
         if not isinstance(transition, Transition):
             raise TypeError('transition must be of type Transition')
 
@@ -45,7 +51,7 @@ class FiniteStateMachine:
         self.__current_applicative_state = transition.next_state
         self.current_applicative_state._exec_entering_action()
 
-    def transit_to(self, state: State):
+    def transit_to(self, state: State) -> None:
         if not isinstance(state, State):
             raise TypeError('state must be of type State')
 
@@ -66,7 +72,7 @@ class FiniteStateMachine:
 
         return True
 
-    def run(self, reset: bool = True, time_budget: float = None):
+    def run(self, reset: bool = True, time_budget: float = None) -> None:
         if not isinstance(reset, bool):
             raise TypeError('reset must be of type bool')
         if not isinstance(time_budget, (float, NoneType)):
@@ -88,6 +94,6 @@ class FiniteStateMachine:
                     self.stop()
                     break
 
-    def stop(self):
+    def stop(self) -> None:
         if self.__current_operational_state == OperationalState.RUNNING:
             self.__current_operational_state = OperationalState.IDLE
