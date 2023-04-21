@@ -1,11 +1,15 @@
 from typing import Optional, Set
+
 from state import State
 
 
 class Layout:
+    __states: set[State]
+    __initial_state: Optional[State]
+
     def __init__(self) -> None:
-        self.__initial_state: Optional[State] = None
-        self.__states: Set[State] = set()
+        self.__initial_state = None
+        self.__states = set()
 
     def is_valid(self) -> bool:
         if self.initial_state is None:
@@ -32,7 +36,6 @@ class Layout:
 
     @initial_state.setter
     def initial_state(self, state) -> None:
-
         if state not in self.__states:
             raise Exception(
                 "the initial state must be part of the Layout states")
