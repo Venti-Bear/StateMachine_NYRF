@@ -1,6 +1,4 @@
-from time import perf_counter
-from typing import Optional
-from state import Parameters, State, MonitoredState
+from state import MonitoredState
 from finite_state_machine import FiniteStateMachine
 from layout import Layout
 from transition import ConditionalTransition
@@ -15,11 +13,9 @@ class TrafficLight(FiniteStateMachine):
         GREEN = MonitoredState()
         YELLOW = MonitoredState()
         RED = MonitoredState()
-        GREEN.add_entering_action(lambda: print(f'\rGREEN', end='   '))
-        YELLOW.add_entering_action(lambda: print(f'\rYELLOW', end='   '))
-        RED.add_entering_action(lambda: print(f'\rRED', end='   '))
-
-        states = {GREEN, YELLOW, RED}
+        GREEN.add_entering_action(lambda: print(f'\r{"GREEN":<7}', end='', flush=True))
+        YELLOW.add_entering_action(lambda: print(f'\r{"YELLOW":<7}', end='', flush=True))
+        RED.add_entering_action(lambda: print(f'\r{"RED":<7}', end='', flush=True))
 
         TRANS_GY = ConditionalTransition(YELLOW, StateEntryDurationCondition(self.__G_TO_Y, GREEN))
         TRANS_YR = ConditionalTransition(RED, StateEntryDurationCondition(self.__Y_TO_R, YELLOW))
@@ -30,7 +26,7 @@ class TrafficLight(FiniteStateMachine):
         RED.add_transition(TRANS_RG)
         
         layout = Layout()
-        layout.add_states(states)
+        layout.add_states({GREEN, YELLOW, RED})
         layout.initial_state = GREEN
 
         super().__init__(layout)

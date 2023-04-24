@@ -61,6 +61,7 @@ class ConditionalTransition(Transition):
     def condition(self, condition):
         self.__condition = condition
 
+    @property
     def is_transiting(self) -> bool:
         """todo"""
         return bool(self.__condition)
