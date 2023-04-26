@@ -9,12 +9,26 @@ from time import perf_counter
 
 
 class FiniteStateMachine:
-    """todo"""
+    """
+    A finite state machine that uses a Layout to define its states and transitions.
+
+    Attributes:
+        __current_operational_state (OperationalState): The current operational state of the state machine.
+        __current_applicative_state (Optional[State]): The current applicative state of the state machine.
+        __layout (Layout): The layout of the state machine.
+    """
     __current_operational_state: OperationalState
     __current_applicative_state: Optional[State]
     __layout: Layout
 
     def __init__(self, layout: Layout, uninitialized: bool = True) -> None:
+        """
+        Initializes a new instance of the FiniteStateMachine class.
+
+        Args:
+            layout (Layout): The layout of the state machine.
+            uninitialized (bool, optional): Whether to leave the state machine uninitialized. Defaults to True.
+        """
         if not isinstance(layout, Layout):
             raise TypeError('layout must be of type Layout')
 
@@ -27,19 +41,39 @@ class FiniteStateMachine:
 
     @property
     def current_operational_state(self) -> OperationalState:
+        """
+        Returns the current operational state of the state machine.
+
+        Returns:
+            OperationalState: The current operational state of the state machine.
+        """
         return self.__current_operational_state
 
     @property
     def current_applicative_state(self) -> State:
+        """
+        Returns the current applicative state of the state machine.
+
+        Returns:
+            State: The current applicative state of the state machine.
+        """
         return self.__current_applicative_state
 
     def reset(self) -> None:
-        """sets the operational state to IDLE"""
+        """
+        Sets the operational state to IDLE
+        """
         self.__current_operational_state = OperationalState.IDLE
         self.__current_applicative_state = self.__layout.initial_state
         self.current_applicative_state._exec_entering_action()
 
     def _transit_by(self, transition: Transition) -> None:
+        """
+        Transitions the state machine to the next state using the given transition.
+
+        Args:
+            transition (Transition): The transition to use for transitioning to the next state.
+        """
         if not isinstance(transition, Transition):
             raise TypeError('transition must be of type Transition')
 
@@ -49,6 +83,12 @@ class FiniteStateMachine:
         self.current_applicative_state._exec_entering_action()
 
     def transit_to(self, state: State) -> None:
+        """
+        Transitions the state machine to the specified state.
+
+        Args:
+            state (State): The state to transition to.
+        """
         if not isinstance(state, State):
             raise TypeError('state must be of type State')
 
@@ -57,6 +97,13 @@ class FiniteStateMachine:
         self.current_applicative_state._exec_entering_action()
 
     def track(self) -> bool:
+        """
+        Advances the state machine by one step and returns True if the state machine has not reached a terminal state,
+        and False otherwise.
+
+        Returns:
+            bool: True if the state machine has not reached a terminal state, and False otherwise.
+        """
         if self.current_applicative_state.is_terminal:
             self.__current_operational_state = OperationalState.TERMINAL_REACHED
             return False
@@ -70,6 +117,13 @@ class FiniteStateMachine:
         return True
 
     def run(self, reset: bool = True, time_budget: float = None) -> None:
+        """
+        Runs the state machine until a terminal state is reached or the time budget is exceeded.
+
+        Args:
+            reset (bool, optional): Whether to reset the state machine before running. Defaults to True.
+            time_budget (float, optional): The maximum time to run the state machine, in seconds. Defaults to None.
+        """
         if not isinstance(reset, bool):
             raise TypeError('reset must be of type bool')
         if not isinstance(time_budget, float) and time_budget is not None:
@@ -92,5 +146,8 @@ class FiniteStateMachine:
                     break
 
     def stop(self) -> None:
+        """
+        Stops the state machine if it is running.
+        """
         if self.__current_operational_state == OperationalState.RUNNING:
             self.__current_operational_state = OperationalState.IDLE
