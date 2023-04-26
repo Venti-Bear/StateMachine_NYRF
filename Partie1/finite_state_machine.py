@@ -1,8 +1,5 @@
-from types import NoneType
 from typing import Optional
 
-from Partie1.layout import Layout
-from Partie1.operational_state import OperationalState
 from layout import Layout
 from operational_state import OperationalState
 from state import State
@@ -75,7 +72,7 @@ class FiniteStateMachine:
     def run(self, reset: bool = True, time_budget: float = None) -> None:
         if not isinstance(reset, bool):
             raise TypeError('reset must be of type bool')
-        if not isinstance(time_budget, (float, NoneType)):
+        if not isinstance(time_budget, float) and time_budget is not None:
             raise TypeError('time_budget must be of type float')
 
         self.__current_operational_state = OperationalState.RUNNING

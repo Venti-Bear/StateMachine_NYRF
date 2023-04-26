@@ -4,6 +4,7 @@ from layout import Layout
 from transition import ConditionalTransition
 from condition import StateEntryDurationCondition
 
+
 class TrafficLight(FiniteStateMachine):
     def __init__(self):
         self.__G_TO_Y = 4.0
@@ -24,16 +25,18 @@ class TrafficLight(FiniteStateMachine):
         GREEN.add_transition(TRANS_GY)
         YELLOW.add_transition(TRANS_YR)
         RED.add_transition(TRANS_RG)
-        
+
         layout = Layout()
         layout.add_states({GREEN, YELLOW, RED})
         layout.initial_state = GREEN
 
         super().__init__(layout)
 
+
 def main():
     traffic_light = TrafficLight()
     traffic_light.run()
+
 
 if __name__ == '__main__':
     quit(main())

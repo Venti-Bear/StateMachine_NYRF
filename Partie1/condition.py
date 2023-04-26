@@ -1,9 +1,10 @@
-from types import NoneType
-from typing import List, Optional, Any
-from state import MonitoredState
+from typing import List, Optional, Any, TYPE_CHECKING
 from abc import ABC
 import abc
 import time
+
+if TYPE_CHECKING:
+    from state import MonitoredState
 
 
 class Condition(ABC):
@@ -51,7 +52,7 @@ class TimedCondition(Condition):
     def __init__(self, duration: float = 1.0, time_reference: Optional[float] = None, inverse: bool = False) -> None:
         if not isinstance(duration, float):
             raise TypeError("duration must be a float")
-        if not isinstance(time_reference, (NoneType, float)):
+        if time_reference is None:
             raise TypeError("time_reference must be a float or None")
 
         super().__init__(inverse)
@@ -78,9 +79,10 @@ class TimedCondition(Condition):
 
 
 class MonitoredStateCondition(Condition, ABC):
-    _monitored_state: MonitoredState
+    _monitored_state: 'MonitoredState'
 
-    def __init__(self, monitored_state: MonitoredState, inverse: bool = False) -> None:
+    def __init__(self, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
+        from state import MonitoredState
         if not isinstance(monitored_state, MonitoredState):
             raise TypeError("monitored_state must be a MonitoredState object")
 
@@ -88,11 +90,12 @@ class MonitoredStateCondition(Condition, ABC):
         self._monitored_state = monitored_state
 
     @property
-    def monitored_state(self) -> MonitoredState:
+    def monitored_state(self) -> 'MonitoredState':
         return self._monitored_state
 
     @monitored_state.setter
-    def monitored_state(self, value: MonitoredState) -> None:
+    def monitored_state(self, value: 'MonitoredState') -> None:
+        from state import MonitoredState
         if not isinstance(value, MonitoredState):
             raise TypeError("value must be a MonitoredState object")
 
@@ -102,7 +105,7 @@ class MonitoredStateCondition(Condition, ABC):
 class StateEntryDurationCondition(MonitoredStateCondition):
     __duration: float
 
-    def __init__(self, duration: float, monitored_state: MonitoredState, inverse: bool = False):
+    def __init__(self, duration: float, monitored_state: 'MonitoredState', inverse: bool = False):
         if not isinstance(duration, float):
             raise TypeError("duration must be a float")
 
@@ -125,7 +128,7 @@ class StateEntryCountCondition(MonitoredStateCondition):
     __expected_count: int
     __auto_reset: bool
 
-    def __init__(self, expected_count: int, monitored_state: MonitoredState, auto_reset: bool = True,
+    def __init__(self, expected_count: int, monitored_state: 'MonitoredState', auto_reset: bool = True,
                  inverse: bool = False) -> None:
         if not isinstance(expected_count, int):
             raise TypeError("expected_count must be a int")
@@ -150,12 +153,12 @@ class StateEntryCountCondition(MonitoredStateCondition):
 class StateValueCondition(MonitoredStateCondition):
     __expected_value: Any
 
-    def __init__(self, expected_value: Any, monitored_state: MonitoredState, inverse: bool = False) -> None:
+    def __init__(self, expected_value: Any, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
         super().__init__(monitored_state, inverse)
         self.__expected_value = expected_value
 
     @property
-    def expected_value(self) -> MonitoredState:
+    def expected_value(self) -> 'MonitoredState':
         return self.__expected_value
 
     @expected_value.setter

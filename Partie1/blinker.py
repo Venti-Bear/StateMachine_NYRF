@@ -1,5 +1,3 @@
-from types import NoneType
-
 from finite_state_machine import FiniteStateMachine
 from layout import Layout
 from state import MonitoredState
@@ -96,7 +94,7 @@ class Blinker(FiniteStateMachine):
         super().__init__(layout)
 
     def turn_on(self, duration: Optional[Union[float, int]] = None) -> None:
-        if not isinstance(duration, (float, int, NoneType)):
+        if not isinstance(duration, (float, int)) and duration is not None:
             raise TypeError("duration must be a float, a int or None")
 
         if duration is None:
@@ -106,7 +104,7 @@ class Blinker(FiniteStateMachine):
             self.transit_to(self.__on_duration)
 
     def turn_off(self, duration: Optional[Union[float, int]] = None) -> None:
-        if not isinstance(duration, (float, int, NoneType)):
+        if not isinstance(duration, (float, int)) and duration is not None:
             raise TypeError("duration must be a float, a int or None")
 
         if duration is None:
@@ -119,9 +117,9 @@ class Blinker(FiniteStateMachine):
               cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
               percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
 
-        if not isinstance(total_duration, (float, int, NoneType)):
+        if not isinstance(total_duration, (float, int)) and total_duration is not None:
             raise TypeError("total_duration must be a float, a int or None")
-        elif not isinstance(cycle_duration, (float, int, NoneType)):
+        elif not isinstance(cycle_duration, (float, int)) and cycle_duration is not None:
             raise TypeError("cycle_duration must be a float, a int or None")
         elif not isinstance(n_cycles, int):
             raise TypeError("n_cycles must be a int")

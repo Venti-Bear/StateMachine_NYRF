@@ -1,6 +1,7 @@
 from typing import Optional, Set
 from state import State
 
+
 class Layout:
     __states: set[State]
     __initial_state: Optional[State]

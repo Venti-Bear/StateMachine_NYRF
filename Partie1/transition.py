@@ -1,20 +1,22 @@
 from abc import ABC
 import abc
 import time
-from types import NoneType
-from typing import Callable, Optional, List, Any
+from typing import Callable, Optional, List, Any, TYPE_CHECKING
 
-from Partie1.condition import Condition
-from Partie1.state import State
-from state import State
 from condition import Condition
+
+if TYPE_CHECKING:
+    from state import State
+
+NoneType = type(None)
 
 
 class Transition(ABC):
-    __next_state: Optional[State]
+    __next_state: Optional['State']
 
-    def __init__(self, next_state: Optional[State] = None) -> None:
-        if not isinstance(next_state, (State, NoneType)):
+    def __init__(self, next_state: Optional['State'] = None) -> None:
+        from state import State
+        if not isinstance(next_state, State) and next_state is not None:
             raise TypeError('next_state must be of type State')
 
         self.__next_state = next_state
@@ -24,11 +26,12 @@ class Transition(ABC):
         return self.__next_state is not None
 
     @property
-    def next_state(self) -> Optional[State]:
+    def next_state(self) -> Optional['State']:
         return self.__next_state
 
     @next_state.setter
-    def next_state(self, next_state: Optional[State]) -> None:
+    def next_state(self, next_state: Optional['State']) -> None:
+        from state import State
         if not isinstance(next_state, (State, NoneType)):
             raise TypeError('next_state must be of type State')
 
@@ -49,7 +52,7 @@ class Transition(ABC):
 class ConditionalTransition(Transition):
     __condition: Optional[Condition]
 
-    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None) -> None:
+    def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         super().__init__(next_state)
 
         if not isinstance(condition, (Condition, NoneType)):
@@ -79,7 +82,7 @@ class ConditionalTransition(Transition):
 class ActionTransition(ConditionalTransition):
     __transiting_actions: list[Callable[[], None]]
 
-    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None) -> None:
+    def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         super().__init__(next_state, condition)
         self.__transiting_actions = []
 
@@ -99,7 +102,7 @@ class MonitoredTransition(ActionTransition):
     __last_transit_time: float
     __transit_count: int
 
-    def __init__(self, next_state: Optional[State] = None, condition: Optional[Condition] = None) -> None:
+    def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         super().__init__(next_state, condition)
         self.__transit_count = 0
         self.__last_transit_time = 0.

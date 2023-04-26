@@ -2,8 +2,6 @@ from __future__ import annotations
 from typing import Callable, Optional, List, TYPE_CHECKING, Any
 import time
 
-from Partie1.transition import Transition
-
 if TYPE_CHECKING:
     from transition import Transition
 
@@ -22,7 +20,7 @@ class Parameters:
 class State:
     """todo"""
     __parameters: Parameters
-    __transition: list[Transition]
+    __transition: list['Transition']
 
     def __init__(self, parameters: Parameters = Parameters()) -> None:
         if not isinstance(parameters, Parameters):
@@ -45,14 +43,15 @@ class State:
         return self.__parameters.terminal
 
     @property
-    def is_transiting(self) -> Optional[Transition]:
+    def is_transiting(self) -> Optional['Transition']:
         """todo"""
         for transition in self.__transition:
             if transition.is_transiting:
                 return transition
 
-    def add_transition(self, transition: Transition) -> None:
+    def add_transition(self, transition: 'Transition') -> None:
         """todo"""
+        from transition import Transition
         if not isinstance(transition, Transition):
             raise TypeError("transition must be a Transition object")
 
