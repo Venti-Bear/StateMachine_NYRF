@@ -5,6 +5,39 @@ from transition import ConditionalTransition
 from condition import StateValueCondition, StateEntryDurationCondition
 
 from typing import Callable, Optional, Union
+from enum import Enum, auto
+
+# CHECK TYPE CHECKIN AND TYPE HINTING
+
+class Side(Enum):
+    """
+    Defines an enumeration of operational states that a system or process can be in.
+
+    OperationalState is an enumeration class that defines four states: UNINITIALIZED,
+    IDLE, RUNNING, and TERMINAL_REACHED. Each state is represented by a unique value
+    that can be compared to other instances of the same class using equality operators.
+
+    The values for each state are generated automatically using the `auto()` function
+    from the `enum` module. This ensures that each state has a unique value that is
+    not dependent on its position in the enumeration definition.
+
+    Example usage:
+        # Create an OperationalState instance
+        state = OperationalState.IDLE
+
+        # Compare two instances of the same class
+        if state == OperationalState.RUNNING:
+            print("The system is currently running.")
+
+        # Loop through all states in the enumeration
+        for state in OperationalState:
+            print(state)
+    """
+    LEFT = auto()
+    RIGHT = auto()
+    BOTH = auto()
+    LEFT_RECIPROCAL = auto()
+    RIGHT_RECIPROCAL = auto()
 
 
 class Blinker(FiniteStateMachine):
@@ -13,6 +46,7 @@ class Blinker(FiniteStateMachine):
     It can also transition between on and off states repeatedly, creating a blinking effect. The Blinker 
     can be controlled to turn on, turn off, or blink with customizable settings.
     """
+    __is_on: bool
     __blink_on_cond: StateEntryDurationCondition
     __blink_stop_on_cond: StateEntryDurationCondition
     __blink_off_cond: StateEntryDurationCondition
@@ -107,6 +141,17 @@ class Blinker(FiniteStateMachine):
         layout.initial_state = self.__off
 
         super().__init__(layout)
+
+        self.__on_states = {self.__on, self.__on_duration, blink_on, blink_stop_on}
+        self.__off_states = {self.__off, self.__off_duration, blink_off, blink_stop_off}
+
+    @property
+    def is_on(self):
+        return self.current_applicative_state in self.__on_states
+
+    @property
+    def is_off(self):
+        return self.current_applicative_state in self.__off_states
 
     def turn_on(self, duration: Optional[Union[float, int]] = None) -> None:
         """
@@ -239,3 +284,48 @@ class Blinker(FiniteStateMachine):
         self.__blink_stop_end.custom_value = "off" if end_off else "on"
 
         self.transit_to(self.__blink_begin)
+
+
+class SideBlinkers:
+    __left_blinker: Blinker
+    __right_blinker: Blinker
+
+    def __init__(self,
+                 left_off_state_generator: Callable[[], MonitoredState],
+                 left_on_state_generator: Callable[[], MonitoredState],
+                 right_off_state_generator: Callable[[], MonitoredState],
+                 right_on_state_generator: Callable[[], MonitoredState]) -> None:
+
+        self.__left_blinker = Blinker(left_off_state_generator, left_on_state_generator)
+        self.__right_blinker = Blinker(right_off_state_generator, right_on_state_generator)
+
+    def is_on(self, side: Side) -> bool:
+        if side == Side.LEFT:
+            return self.__left_blinker.is_on
+        elif side == Side.RIGHT:
+            return self.__right_blinker.is_on
+        elif side == Side.BOTH:
+            return self.__right_blinker.is_on and self.__left_blinker.is_on
+        elif side == Side.LEFT_RECIPROCAL:
+            return self.__left_blinker.is_on and self.__right_blinker.is_off
+        elif side == Side.RIGHT_RECIPROCAL:
+            return self.__right_blinker.is_on and self.__left_blinker.is_off
+
+    # Correction Yoan
+    def is_off(self, side: Side) -> bool:
+        if side == Side.LEFT or side == Side.RIGHT:
+            return not self.is_on(side)
+        elif side == Side.BOTH:
+            return self.__right_blinker.is_off and self.__left_blinker.is_off
+        elif side == Side.LEFT_RECIPROCAL:
+            return self.__left_blinker.is_off and self.__right_blinker.is_on
+        elif side == Side.RIGHT_RECIPROCAL:
+            return self.__right_blinker.is_off and self.__left_blinker.is_on
+
+    # Branch less programming opportunity. (gérer exception)
+    def turn_on(self, side: Side) -> None:
+        if side == Side.LEFT or side == Side.BOTH:
+            self.__left_blinker.turn_on()
+        if side == Side.RIGHT or side == Side.BOTH:
+            self.__right_blinker.turn_on()
+
