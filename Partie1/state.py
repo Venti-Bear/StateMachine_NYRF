@@ -71,6 +71,7 @@ class State:
 
         return all((transition.is_valid for transition in self.__transition))
 
+    @property
     def is_terminal(self) -> bool:
         """
         Returns True if the state is a terminal state, False otherwise.

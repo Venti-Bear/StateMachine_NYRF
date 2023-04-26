@@ -25,7 +25,7 @@ class Transition(ABC):
 
     """
 
-    __next_state: Optional[State]
+    __next_state: Optional['State']
 
     def __init__(self, next_state: Optional['State'] = None) -> None:
         """Initializes a Transition object with the given next_state.
