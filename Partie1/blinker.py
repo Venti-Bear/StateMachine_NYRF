@@ -8,6 +8,11 @@ from typing import Callable, Optional, Union
 
 
 class Blinker(FiniteStateMachine):
+    """
+    A finite state machine that models a blinking light. The Blinker can be in one of two states - on or off. 
+    It can also transition between on and off states repeatedly, creating a blinking effect. The Blinker 
+    can be controlled to turn on, turn off, or blink with customizable settings.
+    """
     __blink_on_cond: StateEntryDurationCondition
     __blink_stop_on_cond: StateEntryDurationCondition
     __blink_off_cond: StateEntryDurationCondition
@@ -23,6 +28,16 @@ class Blinker(FiniteStateMachine):
 
     def __init__(self, off_state_generator: Callable[[], MonitoredState],
                  on_state_generator: Callable[[], MonitoredState]) -> None:
+        """
+        Initializes a new Blinker object with the given off and on state generators.
+
+        Args:
+            off_state_generator: A callable that generates a new MonitoredState object representing the off state.
+            on_state_generator: A callable that generates a new MonitoredState object representing the on state.
+
+        Raises:
+            TypeError: If off_state_generator or on_state_generator is not callable.
+        """
         layout = Layout()
 
         self.__off = off_state_generator()
@@ -94,6 +109,15 @@ class Blinker(FiniteStateMachine):
         super().__init__(layout)
 
     def turn_on(self, duration: Optional[Union[float, int]] = None) -> None:
+        """
+        Turns on the Blinker, with an optional duration argument.
+
+        Args:
+            duration: A float or int representing the duration of the on state, in seconds. If None, the Blinker transitions to the on state indefinitely.
+
+        Raises:
+            TypeError: If duration is not None, float, or int.
+        """
         if not isinstance(duration, (float, int)) and duration is not None:
             raise TypeError("duration must be a float, a int or None")
 
@@ -103,7 +127,16 @@ class Blinker(FiniteStateMachine):
             self.__on_duration_cond.duration = duration
             self.transit_to(self.__on_duration)
 
-    def turn_off(self, duration: Optional[Union[float, int]] = None) -> None:
+    def turn_off(self, duration: Optional[Union[float, int]] = None) -> None:     
+        """
+        Turns off the Blinker, with an optional duration argument.
+
+        Args:
+            duration: A float or int representing the duration of the off state, in seconds. If None, the Blinker transitions to the off state indefinitely.
+
+        Raises:
+            TypeError: If duration is not None, float, or int.
+        """
         if not isinstance(duration, (float, int)) and duration is not None:
             raise TypeError("duration must be a float, a int or None")
 
@@ -116,6 +149,22 @@ class Blinker(FiniteStateMachine):
     def blink(self, *, total_duration: Optional[Union[float, int]] = None,
               cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
               percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
+        """
+        Blinks the Blinker with customizable settings.
+
+        Args:
+            total_duration: A float or int representing the total duration of the blink cycle, in seconds.
+            cycle_duration: A float or int representing the duration of one blink cycle, in seconds.
+            n_cycles: An int representing the number of blink cycles.
+            percent_on: A float or int representing the percentage of time the Blinker is on during a blink cycle. Must be between 0 and 1.
+            begin_on: A bool representing whether the blink cycle starts with the Blinker on or off.
+            end_off: A bool representing whether the blink cycle ends with the Blinker on or off.
+
+        Raises:
+            TypeError: If total_duration, cycle_duration, percent_on, begin_on, or end_off is not None, float, int, or bool.
+            ValueError: If percent_on is not between 0 and 1.
+            TypeError: If invalid arguments are passed, based on the calling convention.
+        """
 
         if not isinstance(total_duration, (float, int)) and total_duration is not None:
             raise TypeError("total_duration must be a float, a int or None")
@@ -146,6 +195,17 @@ class Blinker(FiniteStateMachine):
             raise TypeError("invalid calling convention")
 
     def __blink(self, cycle_duration: Union[float, int], percent_on: Union[float, int], begin_on: bool) -> None:
+        """
+        Blinks the Blinker once with the given cycle duration and percentage of time on.
+
+        Args:
+            cycle_duration: A float or int representing the duration of one blink cycle, in seconds.
+            percent_on: A float or int representing the percentage of time the Blinker is on during a blink cycle. Must be between 0 and 1.
+            begin_on: A bool representing whether the blink cycle starts with the Blinker on or off.
+
+        Raises:
+            TypeError: If cycle_duration or percent_on is not a float or int.
+        """
         on_time = cycle_duration * percent_on
         off_time = cycle_duration - on_time
 
@@ -157,6 +217,16 @@ class Blinker(FiniteStateMachine):
 
     def __blink_stop(self, total_duration: Union[float, int], cycle_duration: Union[float, int],
                      percent_on: Union[float, int], begin_on: bool, end_off: bool) -> None:
+        """
+        Blinks the Blinker repeatedly with the given settings until a total duration is reached.
+
+        Args:
+            total_duration: A float or int representing the total duration of the blink cycle, in seconds.
+            cycle_duration: A float or int representing the duration of one blink cycle, in seconds.
+            percent_on: A float or int representing the percentage of time the Blinker is on during a blink cycle. Must be between 0 and 1.
+            begin_on: A bool representing whether the blink cycle starts with the Blinker on or off.
+            end
+        """
         on_time = cycle_duration * percent_on
         off_time = cycle_duration - on_time
 
