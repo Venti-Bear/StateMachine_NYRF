@@ -9,6 +9,7 @@ from enum import Enum, auto
 
 # CHECK TYPE CHECKIN AND TYPE HINTING
 
+
 class Side(Enum):
     """
     Defines an enumeration of operational states that a system or process can be in.
@@ -38,6 +39,9 @@ class Side(Enum):
     BOTH = auto()
     LEFT_RECIPROCAL = auto()
     RIGHT_RECIPROCAL = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class Blinker(FiniteStateMachine):
@@ -300,12 +304,14 @@ class SideBlinkers:
         self.__right_blinker = Blinker(right_off_state_generator, right_on_state_generator)
 
     def is_on(self, side: Side) -> bool:
-        if side == Side.LEFT:
+        if not isinstance(side, Side):
+            raise TypeError("side must be of type Side")
+        if side == Side.BOTH:
+            return self.__right_blinker.is_on and self.__left_blinker.is_on
+        elif side == Side.LEFT:
             return self.__left_blinker.is_on
         elif side == Side.RIGHT:
             return self.__right_blinker.is_on
-        elif side == Side.BOTH:
-            return self.__right_blinker.is_on and self.__left_blinker.is_on
         elif side == Side.LEFT_RECIPROCAL:
             return self.__left_blinker.is_on and self.__right_blinker.is_off
         elif side == Side.RIGHT_RECIPROCAL:
@@ -313,19 +319,80 @@ class SideBlinkers:
 
     # Correction Yoan
     def is_off(self, side: Side) -> bool:
-        if side == Side.LEFT or side == Side.RIGHT:
-            return not self.is_on(side)
-        elif side == Side.BOTH:
+        if not isinstance(side, Side):
+            raise TypeError("side must be of type Side")
+        if side == Side.BOTH:
             return self.__right_blinker.is_off and self.__left_blinker.is_off
+        elif side == Side.RIGHT:
+            return self.__right_blinker.is_off
+        elif side == Side.LEFT:
+            return self.__left_blinker.is_off
         elif side == Side.LEFT_RECIPROCAL:
             return self.__left_blinker.is_off and self.__right_blinker.is_on
         elif side == Side.RIGHT_RECIPROCAL:
             return self.__right_blinker.is_off and self.__left_blinker.is_on
 
-    # Branch less programming opportunity. (gérer exception)
-    def turn_on(self, side: Side) -> None:
-        if side == Side.LEFT or side == Side.BOTH:
-            self.__left_blinker.turn_on()
-        if side == Side.RIGHT or side == Side.BOTH:
-            self.__right_blinker.turn_on()
+    def turn_on(self, side: Side, duration: Optional[Union[float, int]] = None) -> None:
+        if not isinstance(side, Side):
+            raise TypeError("side must be of type Side")
+        try:
+            turn_on_dict = {
+                Side.LEFT: lambda: self.__left_blinker.turn_on(duration),
+                Side.RIGHT: lambda: self.__right_blinker.turn_on(duration),
+                Side.BOTH: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_on(duration)),
+                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration)),
+                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration))
+            }
+            turn_on_func = turn_on_dict.get(side)
 
+            if turn_on_func is None:
+                raise ValueError("Invalid Side enum value")
+
+            turn_on_func()
+
+        except (TypeError, IOError) as e:
+            raise ValueError("Failed to turn on blinkers")
+
+    def turn_off(self, side: Side, duration: Optional[Union[float, int]] = None) -> None:
+        if not isinstance(side, Side):
+            raise TypeError("side must be of type Side")
+        try:
+            turn_off_dict = {
+                Side.LEFT: lambda: self.__left_blinker.turn_off(duration),
+                Side.RIGHT: lambda: self.__right_blinker.turn_off(duration),
+                Side.BOTH: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_off(duration)),
+                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration)),
+                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration))
+            }
+            turn_off_func = turn_off_dict.get(side)
+
+            if turn_off_func is None:
+                raise ValueError("Invalid Side enum value")
+
+            turn_off_func()
+
+        except (TypeError, IOError) as e:
+            raise ValueError("Failed to turn off blinkers")
+
+    def blink(self, side: Side, *, total_duration: Optional[Union[float, int]] = None,
+              cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
+              percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
+        if not isinstance(side, Side):
+            raise TypeError("side must be of type Side")
+        try:
+            blink_dict = {
+                Side.LEFT: lambda: self.__left_blinker.blink(),
+                Side.RIGHT: lambda: self.__right_blinker.blink(),
+                Side.BOTH: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink()),
+                Side.LEFT_RECIPROCAL: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink()),
+                Side.RIGHT_RECIPROCAL: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink())
+            }
+            blink_func = blink_dict.get(side)
+
+            if blink_func is None:
+                raise ValueError("Invalid Side enum value")
+
+            blink_func()
+
+        except (TypeError, IOError) as e:
+            raise ValueError("Failed to blink the blinkers")
