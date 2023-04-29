@@ -7,8 +7,6 @@ from condition import StateValueCondition, StateEntryDurationCondition
 from typing import Callable, Optional, Union
 from enum import Enum, auto
 
-# CHECK TYPE CHECKIN AND TYPE HINTING
-
 
 class Side(Enum):
     """
@@ -46,11 +44,10 @@ class Side(Enum):
 
 class Blinker(FiniteStateMachine):
     """
-    A finite state machine that models a blinking light. The Blinker can be in one of two states - on or off. 
-    It can also transition between on and off states repeatedly, creating a blinking effect. The Blinker 
+    A finite state machine that models a blinking light. The Blinker can be in one of two states - on or off.
+    It can also transition between on and off states repeatedly, creating a blinking effect. The Blinker
     can be controlled to turn on, turn off, or blink with customizable settings.
     """
-    __is_on: bool
     __blink_on_cond: StateEntryDurationCondition
     __blink_stop_on_cond: StateEntryDurationCondition
     __blink_off_cond: StateEntryDurationCondition
@@ -97,41 +94,57 @@ class Blinker(FiniteStateMachine):
         # transition #
 
         # off/on duration
-        self.__off_duration_cond = StateEntryDurationCondition(0, self.__off_duration)
-        self.__on_duration_cond = StateEntryDurationCondition(0, self.__on_duration)
+        self.__off_duration_cond = StateEntryDurationCondition(
+            0, self.__off_duration)
+        self.__on_duration_cond = StateEntryDurationCondition(
+            0, self.__on_duration)
 
-        self.__off_duration.add_transition(ConditionalTransition(self.__on, self.__off_duration_cond))
-        self.__on_duration.add_transition(ConditionalTransition(self.__off, self.__on_duration_cond))
+        self.__off_duration.add_transition(
+            ConditionalTransition(self.__on, self.__off_duration_cond))
+        self.__on_duration.add_transition(
+            ConditionalTransition(self.__off, self.__on_duration_cond))
 
         # blink off/on
         self.__blink_off_cond = StateEntryDurationCondition(0, blink_off)
         self.__blink_on_cond = StateEntryDurationCondition(0, blink_on)
 
-        blink_off.add_transition(ConditionalTransition(blink_on, self.__blink_off_cond))
-        blink_on.add_transition(ConditionalTransition(blink_off, self.__blink_on_cond))
+        blink_off.add_transition(ConditionalTransition(
+            blink_on, self.__blink_off_cond))
+        blink_on.add_transition(ConditionalTransition(
+            blink_off, self.__blink_on_cond))
 
         cond_off = StateValueCondition("off", self.__blink_begin)
         cond_on = StateValueCondition("on", self.__blink_begin)
 
-        self.__blink_begin.add_transition(ConditionalTransition(blink_on, cond_on))
-        self.__blink_begin.add_transition(ConditionalTransition(blink_off, cond_off))
+        self.__blink_begin.add_transition(
+            ConditionalTransition(blink_on, cond_on))
+        self.__blink_begin.add_transition(
+            ConditionalTransition(blink_off, cond_off))
 
         # stop
 
-        self.__blink_stop_off_cond = StateEntryDurationCondition(0, blink_stop_off)
-        self.__blink_stop_on_cond = StateEntryDurationCondition(0, blink_stop_on)
+        self.__blink_stop_off_cond = StateEntryDurationCondition(
+            0, blink_stop_off)
+        self.__blink_stop_on_cond = StateEntryDurationCondition(
+            0, blink_stop_on)
 
-        blink_stop_off.add_transition(ConditionalTransition(blink_stop_on, self.__blink_stop_off_cond))
-        blink_stop_on.add_transition(ConditionalTransition(blink_stop_off, self.__blink_stop_on_cond))
+        blink_stop_off.add_transition(ConditionalTransition(
+            blink_stop_on, self.__blink_stop_off_cond))
+        blink_stop_on.add_transition(ConditionalTransition(
+            blink_stop_off, self.__blink_stop_on_cond))
 
         cond_off = StateValueCondition("off", self.__blink_stop_begin)
         cond_on = StateValueCondition("on", self.__blink_stop_begin)
 
-        self.__blink_stop_begin.add_transition(ConditionalTransition(blink_stop_on, cond_on))
-        self.__blink_stop_begin.add_transition(ConditionalTransition(blink_stop_off, cond_off))
+        self.__blink_stop_begin.add_transition(
+            ConditionalTransition(blink_stop_on, cond_on))
+        self.__blink_stop_begin.add_transition(
+            ConditionalTransition(blink_stop_off, cond_off))
 
-        self.__blink_stop_cond = StateEntryDurationCondition(0, self.__blink_stop_begin)
-        transition = ConditionalTransition(self.__blink_stop_end, self.__blink_stop_cond)
+        self.__blink_stop_cond = StateEntryDurationCondition(
+            0, self.__blink_stop_begin)
+        transition = ConditionalTransition(
+            self.__blink_stop_end, self.__blink_stop_cond)
 
         blink_stop_off.add_transition(transition)
         blink_stop_on.add_transition(transition)
@@ -146,8 +159,10 @@ class Blinker(FiniteStateMachine):
 
         super().__init__(layout)
 
-        self.__on_states = {self.__on, self.__on_duration, blink_on, blink_stop_on}
-        self.__off_states = {self.__off, self.__off_duration, blink_off, blink_stop_off}
+        self.__on_states = {self.__on,
+                            self.__on_duration, blink_on, blink_stop_on}
+        self.__off_states = {self.__off,
+                             self.__off_duration, blink_off, blink_stop_off}
 
     @property
     def is_on(self):
@@ -176,7 +191,7 @@ class Blinker(FiniteStateMachine):
             self.__on_duration_cond.duration = duration
             self.transit_to(self.__on_duration)
 
-    def turn_off(self, duration: Optional[Union[float, int]] = None) -> None:     
+    def turn_off(self, duration: Optional[Union[float, int]] = None) -> None:
         """
         Turns off the Blinker, with an optional duration argument.
 
@@ -233,13 +248,16 @@ class Blinker(FiniteStateMachine):
         if cycle_duration is not None and total_duration is None and n_cycles is None:
             self.__blink(cycle_duration, percent_on, begin_on)
         elif total_duration is not None and cycle_duration is not None and n_cycles is None:
-            self.__blink_stop(total_duration, cycle_duration, percent_on, begin_on, end_off)
+            self.__blink_stop(total_duration, cycle_duration,
+                              percent_on, begin_on, end_off)
         elif total_duration is not None and cycle_duration is None and n_cycles is not None:
             cycle_duration = total_duration / n_cycles
-            self.__blink_stop(total_duration, cycle_duration, percent_on, begin_on, end_off)
+            self.__blink_stop(total_duration, cycle_duration,
+                              percent_on, begin_on, end_off)
         elif total_duration is None and cycle_duration is not None and n_cycles is not None:
             total_duration = cycle_duration * n_cycles
-            self.__blink_stop(total_duration, cycle_duration, percent_on, begin_on, end_off)
+            self.__blink_stop(total_duration, cycle_duration,
+                              percent_on, begin_on, end_off)
         else:
             raise TypeError("invalid calling convention")
 
@@ -291,6 +309,13 @@ class Blinker(FiniteStateMachine):
 
 
 class SideBlinkers:
+    """
+    A class that represents the side blinkers of a given object, controlling the state of the left and right blinkers.
+
+    Attributes:
+        __left_blinker (Blinker): The left blinker.
+        __right_blinker (Blinker): The right blinker.
+    """
     __left_blinker: Blinker
     __right_blinker: Blinker
 
@@ -299,11 +324,31 @@ class SideBlinkers:
                  left_on_state_generator: Callable[[], MonitoredState],
                  right_off_state_generator: Callable[[], MonitoredState],
                  right_on_state_generator: Callable[[], MonitoredState]) -> None:
+        """
+        Initializes the SideBlinkers with the provided state generator callables for left and right blinkers.
 
-        self.__left_blinker = Blinker(left_off_state_generator, left_on_state_generator)
-        self.__right_blinker = Blinker(right_off_state_generator, right_on_state_generator)
+        Args:
+            left_off_state_generator (Callable[[], MonitoredState]): A callable to generate the off state for the left blinker.
+            left_on_state_generator (Callable[[], MonitoredState]): A callable to generate the on state for the left blinker.
+            right_off_state_generator (Callable[[], MonitoredState]): A callable to generate the off state for the right blinker.
+            right_on_state_generator (Callable[[], MonitoredState]): A callable to generate the on state for the right blinker.
+        """
+
+        self.__left_blinker = Blinker(
+            left_off_state_generator, left_on_state_generator)
+        self.__right_blinker = Blinker(
+            right_off_state_generator, right_on_state_generator)
 
     def is_on(self, side: Side) -> bool:
+        """
+        Checks if the specified side blinker(s) is/are on.
+
+        Args:
+            side (Side): The side to check (LEFT, RIGHT, BOTH, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL).
+
+        Returns:
+            bool: True if the specified side blinker(s) is/are on, False otherwise.
+        """
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         if side == Side.BOTH:
@@ -319,6 +364,15 @@ class SideBlinkers:
 
     # Correction Yoan
     def is_off(self, side: Side) -> bool:
+        """
+        Checks if the specified side blinker(s) is/are off.
+
+        Args:
+            side (Side): The side to check (LEFT, RIGHT, BOTH, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL).
+
+        Returns:
+            bool: True if the specified side blinker(s) is/are off, False otherwise.
+        """
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         if side == Side.BOTH:
@@ -333,6 +387,13 @@ class SideBlinkers:
             return self.__right_blinker.is_off and self.__left_blinker.is_on
 
     def turn_on(self, side: Side, duration: Optional[Union[float, int]] = None) -> None:
+        """
+        Turns on the specified side blinker(s) for a given duration or indefinitely if duration is not provided.
+
+        Args:
+            side (Side): The side to turn on (LEFT, RIGHT, BOTH, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL).
+            duration (Optional[Union[float, int]]): The duration for which the blinker(s) should be on, in seconds. None for indefinite.
+        """
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         try:
@@ -341,7 +402,8 @@ class SideBlinkers:
                 Side.RIGHT: lambda: self.__right_blinker.turn_on(duration),
                 Side.BOTH: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_on(duration)),
                 Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration)),
-                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration))
+                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(
+                    duration), self.__right_blinker.turn_on(duration))
             }
             turn_on_func = turn_on_dict.get(side)
 
@@ -354,6 +416,13 @@ class SideBlinkers:
             raise ValueError("Failed to turn on blinkers")
 
     def turn_off(self, side: Side, duration: Optional[Union[float, int]] = None) -> None:
+        """
+        Turns off the specified side blinker(s) for a given duration or indefinitely if duration is not provided.
+
+        Args:
+            side (Side): The side to turn off (LEFT, RIGHT, BOTH, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL).
+            duration (Optional[Union[float, int]]): The duration for which the blinker(s) should be off, in seconds. None for indefinite.
+        """
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         try:
@@ -362,7 +431,8 @@ class SideBlinkers:
                 Side.RIGHT: lambda: self.__right_blinker.turn_off(duration),
                 Side.BOTH: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_off(duration)),
                 Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration)),
-                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration))
+                Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(
+                    duration), self.__right_blinker.turn_off(duration))
             }
             turn_off_func = turn_off_dict.get(side)
 
@@ -377,15 +447,70 @@ class SideBlinkers:
     def blink(self, side: Side, *, total_duration: Optional[Union[float, int]] = None,
               cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
               percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
+        """
+        Blinks the specified side blinker(s) based on the given parameters.
+
+        Args:
+            side (Side): The side to blink (LEFT, RIGHT, BOTH, LEFT_RECIPROCAL, or RIGHT_RECIPROCAL).
+            total_duration (Optional[Union[float, int]]): The total duration of the blinking sequence, in seconds. None for indefinite.
+            cycle_duration (Optional[Union[float, int]]): The duration of each on-off cycle, in seconds. None for automatic calculation.
+            n_cycles (Optional[int]): The number of on-off cycles to perform. None for automatic calculation.
+            percent_on (Union[float, int]): The percentage of time each cycle should be on, expressed as a float between 0 and 1 or an integer between 0 and 100.
+            begin_on (bool): Whether the blinking sequence should begin with the blinker(s) on (True) or off (False).
+            end_off (bool): Whether the blinking sequence should end with the blinker(s) off (True) or maintain their final state (False).
+        """
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         try:
             blink_dict = {
-                Side.LEFT: lambda: self.__left_blinker.blink(),
-                Side.RIGHT: lambda: self.__right_blinker.blink(),
-                Side.BOTH: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink()),
-                Side.LEFT_RECIPROCAL: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink()),
-                Side.RIGHT_RECIPROCAL: lambda: (self.__right_blinker.blink(), self.__left_blinker.blink())
+                Side.LEFT: lambda: self.__left_blinker.blink(total_duration=total_duration,
+                                                             cycle_duration=cycle_duration,
+                                                             n_cycles=n_cycles,
+                                                             percent_on=percent_on,
+                                                             begin_on=begin_on,
+                                                             end_off=end_off),
+                Side.RIGHT: lambda: self.__right_blinker.blink(total_duration=total_duration,
+                                                               cycle_duration=cycle_duration,
+                                                               n_cycles=n_cycles,
+                                                               percent_on=percent_on,
+                                                               begin_on=begin_on,
+                                                               end_off=end_off),
+                Side.BOTH: lambda: (self.__right_blinker.blink(total_duration=total_duration,
+                                                               cycle_duration=cycle_duration,
+                                                               n_cycles=n_cycles,
+                                                               percent_on=percent_on,
+                                                               begin_on=begin_on,
+                                                               end_off=end_off),
+                                    self.__left_blinker.blink(total_duration=total_duration,
+                                                              cycle_duration=cycle_duration,
+                                                              n_cycles=n_cycles,
+                                                              percent_on=percent_on,
+                                                              begin_on=begin_on,
+                                                              end_off=end_off)),
+                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.blink(total_duration=total_duration,
+                                                                         cycle_duration=cycle_duration,
+                                                                         n_cycles=n_cycles,
+                                                                         percent_on=percent_on,
+                                                                         begin_on=begin_on,
+                                                                         end_off=end_off),
+                                               self.__right_blinker.blink(total_duration=total_duration,
+                                                                          cycle_duration=cycle_duration,
+                                                                          n_cycles=n_cycles,
+                                                                          percent_on=percent_on,
+                                                                          begin_on=not begin_on,
+                                                                          end_off=not end_off)),
+                Side.RIGHT_RECIPROCAL: lambda: (self.__right_blinker.blink(total_duration=total_duration,
+                                                                           cycle_duration=cycle_duration,
+                                                                           n_cycles=n_cycles,
+                                                                           percent_on=percent_on,
+                                                                           begin_on=begin_on,
+                                                                           end_off=end_off),
+                                                self.__left_blinker.blink(total_duration=total_duration,
+                                                                          cycle_duration=cycle_duration,
+                                                                          n_cycles=n_cycles,
+                                                                          percent_on=percent_on,
+                                                                          begin_on=not begin_on,
+                                                                          end_off=not end_off))
             }
             blink_func = blink_dict.get(side)
 
