@@ -189,7 +189,7 @@ class MonitoredStateCondition(Condition, ABC):
     Attributes:
         _monitored_state (MonitoredState): The monitored state on which the condition depends.
     """
-    _monitored_state: MonitoredState
+    _monitored_state: 'MonitoredState'
 
     def __init__(self, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
         from state import MonitoredState

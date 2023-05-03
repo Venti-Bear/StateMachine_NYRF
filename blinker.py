@@ -95,9 +95,9 @@ class Blinker(FiniteStateMachine):
 
         # off/on duration
         self.__off_duration_cond = StateEntryDurationCondition(
-            0, self.__off_duration)
+            0.0, self.__off_duration)
         self.__on_duration_cond = StateEntryDurationCondition(
-            0, self.__on_duration)
+            0.0, self.__on_duration)
 
         self.__off_duration.add_transition(
             ConditionalTransition(self.__on, self.__off_duration_cond))
@@ -105,8 +105,8 @@ class Blinker(FiniteStateMachine):
             ConditionalTransition(self.__off, self.__on_duration_cond))
 
         # blink off/on
-        self.__blink_off_cond = StateEntryDurationCondition(0, blink_off)
-        self.__blink_on_cond = StateEntryDurationCondition(0, blink_on)
+        self.__blink_off_cond = StateEntryDurationCondition(0.0, blink_off)
+        self.__blink_on_cond = StateEntryDurationCondition(0.0, blink_on)
 
         blink_off.add_transition(ConditionalTransition(
             blink_on, self.__blink_off_cond))
@@ -124,9 +124,9 @@ class Blinker(FiniteStateMachine):
         # stop
 
         self.__blink_stop_off_cond = StateEntryDurationCondition(
-            0, blink_stop_off)
+            0.0, blink_stop_off)
         self.__blink_stop_on_cond = StateEntryDurationCondition(
-            0, blink_stop_on)
+            0.0, blink_stop_on)
 
         blink_stop_off.add_transition(ConditionalTransition(
             blink_stop_on, self.__blink_stop_off_cond))
@@ -142,7 +142,7 @@ class Blinker(FiniteStateMachine):
             ConditionalTransition(blink_stop_off, cond_off))
 
         self.__blink_stop_cond = StateEntryDurationCondition(
-            0, self.__blink_stop_begin)
+            0.0, self.__blink_stop_begin)
         transition = ConditionalTransition(
             self.__blink_stop_end, self.__blink_stop_cond)
 
