@@ -401,7 +401,8 @@ class SideBlinkers:
                 Side.LEFT: lambda: self.__left_blinker.turn_on(duration),
                 Side.RIGHT: lambda: self.__right_blinker.turn_on(duration),
                 Side.BOTH: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_on(duration)),
-                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration)),
+                Side.LEFT_RECIPROCAL: lambda: (
+                    self.__left_blinker.turn_on(duration), self.__right_blinker.turn_off(duration)),
                 Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(
                     duration), self.__right_blinker.turn_on(duration))
             }
@@ -430,7 +431,8 @@ class SideBlinkers:
                 Side.LEFT: lambda: self.__left_blinker.turn_off(duration),
                 Side.RIGHT: lambda: self.__right_blinker.turn_off(duration),
                 Side.BOTH: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_off(duration)),
-                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration)),
+                Side.LEFT_RECIPROCAL: lambda: (
+                    self.__left_blinker.turn_off(duration), self.__right_blinker.turn_on(duration)),
                 Side.RIGHT_RECIPROCAL: lambda: (self.__left_blinker.turn_on(
                     duration), self.__right_blinker.turn_off(duration))
             }
@@ -462,56 +464,35 @@ class SideBlinkers:
         if not isinstance(side, Side):
             raise TypeError("side must be of type Side")
         try:
-            blink_dict = {
-                Side.LEFT: lambda: self.__left_blinker.blink(total_duration=total_duration,
-                                                             cycle_duration=cycle_duration,
-                                                             n_cycles=n_cycles,
-                                                             percent_on=percent_on,
-                                                             begin_on=begin_on,
-                                                             end_off=end_off),
-                Side.RIGHT: lambda: self.__right_blinker.blink(total_duration=total_duration,
-                                                               cycle_duration=cycle_duration,
-                                                               n_cycles=n_cycles,
-                                                               percent_on=percent_on,
-                                                               begin_on=begin_on,
-                                                               end_off=end_off),
-                Side.BOTH: lambda: (self.__right_blinker.blink(total_duration=total_duration,
-                                                               cycle_duration=cycle_duration,
-                                                               n_cycles=n_cycles,
-                                                               percent_on=percent_on,
-                                                               begin_on=begin_on,
-                                                               end_off=end_off),
-                                    self.__left_blinker.blink(total_duration=total_duration,
-                                                              cycle_duration=cycle_duration,
-                                                              n_cycles=n_cycles,
-                                                              percent_on=percent_on,
-                                                              begin_on=begin_on,
-                                                              end_off=end_off)),
-                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.blink(total_duration=total_duration,
-                                                                         cycle_duration=cycle_duration,
-                                                                         n_cycles=n_cycles,
-                                                                         percent_on=percent_on,
-                                                                         begin_on=begin_on,
-                                                                         end_off=end_off),
-                                               self.__right_blinker.blink(total_duration=total_duration,
-                                                                          cycle_duration=cycle_duration,
-                                                                          n_cycles=n_cycles,
-                                                                          percent_on=percent_on,
-                                                                          begin_on=not begin_on,
-                                                                          end_off=not end_off)),
-                Side.RIGHT_RECIPROCAL: lambda: (self.__right_blinker.blink(total_duration=total_duration,
-                                                                           cycle_duration=cycle_duration,
-                                                                           n_cycles=n_cycles,
-                                                                           percent_on=percent_on,
-                                                                           begin_on=begin_on,
-                                                                           end_off=end_off),
-                                                self.__left_blinker.blink(total_duration=total_duration,
-                                                                          cycle_duration=cycle_duration,
-                                                                          n_cycles=n_cycles,
-                                                                          percent_on=percent_on,
-                                                                          begin_on=not begin_on,
-                                                                          end_off=not end_off))
+            param_dict = {
+                'total_duration': total_duration,
+                'cycle_duration': cycle_duration,
+                'n_cycles': n_cycles,
+                'percent_on': percent_on,
+                'begin_on': begin_on,
+                'end_off': end_off
             }
+
+            param_dict_reciprocal = {
+                'total_duration': total_duration,
+                'cycle_duration': cycle_duration,
+                'n_cycles': n_cycles,
+                'percent_on': percent_on,
+                'begin_on': not begin_on,
+                'end_off': not end_off
+            }
+
+            blink_dict = {
+                Side.LEFT: lambda: self.__left_blinker.blink(**param_dict),
+                Side.RIGHT: lambda: self.__right_blinker.blink(**param_dict),
+                Side.BOTH: lambda: (self.__right_blinker.blink(**param_dict),
+                                    self.__left_blinker.blink(**param_dict)),
+                Side.LEFT_RECIPROCAL: lambda: (self.__left_blinker.blink(**param_dict),
+                                               self.__right_blinker.blink(**param_dict_reciprocal)),
+                Side.RIGHT_RECIPROCAL: lambda: (self.__right_blinker.blink(**param_dict),
+                                                self.__left_blinker.blink(**param_dict_reciprocal))
+            }
+
             blink_func = blink_dict.get(side)
 
             if blink_func is None:
