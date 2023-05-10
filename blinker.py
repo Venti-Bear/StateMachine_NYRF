@@ -362,7 +362,6 @@ class SideBlinkers:
         elif side == Side.RIGHT_RECIPROCAL:
             return self.__right_blinker.is_on and self.__left_blinker.is_off
 
-    # Correction Yoan
     def is_off(self, side: Side) -> bool:
         """
         Checks if the specified side blinker(s) is/are off.
@@ -502,3 +501,7 @@ class SideBlinkers:
 
         except (TypeError, IOError) as e:
             raise ValueError("Failed to blink the blinkers")
+
+    def track(self):
+        self.__left_blinker.track()
+        self.__right_blinker.track()
