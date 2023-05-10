@@ -1,7 +1,7 @@
 from state import *
 from layout import Layout
 from transition import ConditionalTransition
-from condition import StateEntryDurationCondition
+from condition import StateEntryDurationCondition, ValueCondition
 from Robot import Robot
 from blinker import Side
 
@@ -9,13 +9,17 @@ class InitializationValidation(Layout):
     def __init__(self):
         self.__robot = Robot()
 
+        success = ValueCondition()
+
         ROBOT_INSTANTIATION = MonitoredState()
+        ROBOT_INSTANTIATION.custom_value = self.__robot.is_instantiated
 
         INSTANTIATION_FAILED = ActionState()
         INSTANTIATION_FAILED.add_in_state_action(lambda: (print("Robot is not connected")))
 
+
         ROBOT_INTEGRITY = MonitoredState()
-        ROBOT_INTEGRITY.add_in_state_action(self.__robot.check_integrity)
+        ROBOT_INTEGRITY.custom_value = self.__robot.is_trustworthy      # has integrity
         
         END = ActionState(Parameters(False, True, True))
         END.add_in_state_action(lambda: (print("Robot shutting down")))
