@@ -84,8 +84,8 @@ class ValueCondition(Condition):
         __expected_value (Any): The expected value to compare against.
         __initial_value (Any): The initial value to compare against the expected value.
     """
-    __expected_value: Any
-    __initial_value: Any
+    # __expected_value: Any
+    # __initial_value: Any
 
     def __init__(self, initial_value: Any, expected_value: Any, inverse: bool = False) -> None:
         """
@@ -119,8 +119,8 @@ class TimedCondition(Condition):
         __duration (float): The duration of time to wait before the condition becomes True.
         __time_reference (float): The time reference from which to start counting.
     """
-    __duration: float
-    __time_reference: float
+    # __duration: float
+    # __time_reference: float
 
     def __init__(self, duration: float = 1.0, time_reference: Optional[float] = None, inverse: bool = False) -> None:
         """
@@ -189,7 +189,7 @@ class MonitoredStateCondition(Condition, ABC):
     Attributes:
         _monitored_state (MonitoredState): The monitored state on which the condition depends.
     """
-    _monitored_state: 'MonitoredState'
+    # _monitored_state: 'MonitoredState'
 
     def __init__(self, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
         from state import MonitoredState
@@ -245,7 +245,7 @@ class StateEntryDurationCondition(MonitoredStateCondition):
     Attributes:
     - _duration: A float representing the duration that will be compared to the monitored state.
     """
-    __duration: float
+    # __duration: float
 
     def __init__(self, duration: float, monitored_state: 'MonitoredState', inverse: bool = False):
         """
@@ -306,8 +306,8 @@ class StateEntryCountCondition(MonitoredStateCondition):
         __auto_reset (bool): Whether or not to automatically reset the entry count when the Condition is met.
         __expected_count (int): The number of entry counts to check for.
     """
-    __expected_count: int
-    __auto_reset: bool
+    # __expected_count: int
+    # __auto_reset: bool
 
     def __init__(self, expected_count: int, monitored_state: 'MonitoredState', auto_reset: bool = True,
                  inverse: bool = False) -> None:
@@ -355,7 +355,7 @@ class StateValueCondition(MonitoredStateCondition):
     Attributes:
         expected_value (Any): The expected value that the custom value of the monitored state should match.
     """
-    __expected_value: Any
+    # __expected_value: Any
 
     def __init__(self, expected_value: Any, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
         """
@@ -404,7 +404,7 @@ class ManyConditions(Condition, ABC):
         _condition_list (list[Condition]): The list of conditions to be evaluated together.
 
     """
-    _condition_list: list[Condition]
+    # _condition_list: list[Condition]
 
     def __init__(self, inverse: bool = False) -> None:
         """

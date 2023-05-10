@@ -14,8 +14,8 @@
 # TASK_2 -> HOME
 # ...
 
-
 from finite_state_machine import FiniteStateMachine
+from initialisation_validation import InitializationValidation
 from layout import Layout
 
 class C64Project(FiniteStateMachine):
@@ -31,9 +31,7 @@ class C64Project(FiniteStateMachine):
 
         # Ajouter les transitions aux states
 
-        layout = Layout()
-        # layout.add_states({GREEN, YELLOW, RED})
-        # layout.initial_state = GREEN
+        layout = InitializationValidation()
 
         super().__init__(layout)
     

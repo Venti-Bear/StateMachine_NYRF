@@ -17,9 +17,9 @@ class FiniteStateMachine:
         __current_applicative_state (Optional[State]): The current applicative state of the state machine.
         __layout (Layout): The layout of the state machine.
     """
-    __current_operational_state: OperationalState
-    __current_applicative_state: Optional[State]
-    __layout: Layout
+    # __current_operational_state: OperationalState
+    # __current_applicative_state: Optional[State]
+    # __layout: Layout
 
     def __init__(self, layout: Layout, uninitialized: bool = True) -> None:
         """

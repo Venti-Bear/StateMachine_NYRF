@@ -14,16 +14,12 @@
 # TASK_2 -> HOME
 # ...
 
-# from GoPiGo3 import GoPiGo3
+from easygopigo3 import EasyGoPiGo3 as GoPiGo3 
 from enum import Enum, auto
 from typing import Optional, Tuple
 
 from blinker import SideBlinkers
 from state import MonitoredState
-
-
-class GoPiGo3:
-    ...
 
 
 class LedBlinkers(SideBlinkers):
@@ -90,7 +86,7 @@ class EyeBlinkers(SideBlinkers):
 
     @right_color.setter
     def right_color(self, color: Tuple[int, int, int]):
-        self.right_color = color
+        self.__right_color = color
 
     @property
     def left_color(self):
@@ -98,7 +94,7 @@ class EyeBlinkers(SideBlinkers):
 
     @left_color.setter
     def left_color(self, color: Tuple[int, int, int]):
-        self.right_color = color
+        self.__left_color = color
 
     def set_color(self, color: Tuple[int, int, int]):
         self.left_color = color
@@ -193,6 +189,10 @@ class Robot:
         self.eye_blinkers.track()
         self.led_blinkers.track()
 
+    def check_integrity(self):
+        return True
 
-c = Controller(GoPiGo3())
-print(c.next_char())
+    def set_eye_color(self, color: Tuple):
+        self.eye_blinkers.set_color(color)
+
+
