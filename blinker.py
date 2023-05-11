@@ -149,6 +149,15 @@ class Blinker(FiniteStateMachine):
         blink_stop_off.add_transition(transition)
         blink_stop_on.add_transition(transition)
 
+        cond_off = StateValueCondition("off", self.__blink_stop_end)
+        cond_on = StateValueCondition("on", self.__blink_stop_end)
+
+        self.__blink_stop_end.add_transition(
+            ConditionalTransition(self.__on, cond_on))
+        self.__blink_stop_end.add_transition(
+            ConditionalTransition(self.__off, cond_off))
+
+
         # add to layout
 
         layout.add_states(
@@ -157,7 +166,7 @@ class Blinker(FiniteStateMachine):
 
         layout.initial_state = self.__off
 
-        super().__init__(layout)
+        super().__init__(layout, uninitialized=False)
 
         self.__on_states = {self.__on,
                             self.__on_duration, blink_on, blink_stop_on}
@@ -234,7 +243,7 @@ class Blinker(FiniteStateMachine):
             raise TypeError("total_duration must be a float, a int or None")
         elif not isinstance(cycle_duration, (float, int)) and cycle_duration is not None:
             raise TypeError("cycle_duration must be a float, a int or None")
-        elif not isinstance(n_cycles, int):
+        elif not isinstance(n_cycles, int) and n_cycles is not None:
             raise TypeError("n_cycles must be a int")
         elif not isinstance(percent_on, (int, float)):
             raise TypeError("percent_on must be a float or a int")
@@ -299,13 +308,13 @@ class Blinker(FiniteStateMachine):
 
         self.__blink_stop_cond.duration = total_duration
 
-        self.__blink_on_cond.duration = on_time
-        self.__blink_off_cond.duration = off_time
+        self.__blink_stop_on_cond.duration = on_time
+        self.__blink_stop_off_cond.duration = off_time
 
         self.__blink_stop_begin.custom_value = "on" if begin_on else "off"
         self.__blink_stop_end.custom_value = "off" if end_off else "on"
 
-        self.transit_to(self.__blink_begin)
+        self.transit_to(self.__blink_stop_begin)
 
 
 class SideBlinkers:
@@ -499,7 +508,7 @@ class SideBlinkers:
 
             blink_func()
 
-        except (TypeError, IOError) as e:
+        except (IOError) as e:
             raise ValueError("Failed to blink the blinkers")
 
     def track(self):

@@ -17,6 +17,7 @@
 from easygopigo3 import EasyGoPiGo3 as GoPiGo3
 from enum import Enum, auto
 from typing import Optional, Tuple, Union
+from time import perf_counter
 
 from blinker import SideBlinkers, Side
 from state import MonitoredState
@@ -28,22 +29,22 @@ class LedBlinkers(SideBlinkers):
 
         def generate_off_state_left() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: print('led_off_state_left'))
+            mon.add_entering_action(lambda: self.robot.led_off('left'))
             return mon
 
         def generate_off_state_right() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: print('led_off_state_right'))
+            mon.add_entering_action(lambda: self.robot.led_off('right'))
             return mon
 
         def generate_on_state_left() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: print('led_on_state_left'))
+            mon.add_entering_action(lambda: self.robot.led_on('left'))
             return mon
 
         def generate_on_state_right() -> MonitoredState:
-            mon = MonitoredState()
-            mon.add_entering_action(lambda: print('led_on_state_right'))
+            mon = MonitoredState()            
+            mon.add_entering_action(lambda: self.robot.led_on('right'))
             return mon
 
         super().__init__(generate_off_state_left, generate_on_state_left, generate_off_state_right,
@@ -53,28 +54,32 @@ class LedBlinkers(SideBlinkers):
 class EyeBlinkers(SideBlinkers):
     def __init__(self, robot: GoPiGo3):
         self.robot = robot
-        self.__right_color = (255, 255, 255)
-        self.__left_color = (255, 255, 255)
+        self.__right_color = (100, 100, 100)
+        self.__left_color = (100, 100, 100)
 
         def generate_off_state_left() -> MonitoredState:
+            mon = MonitoredState()
+            mon.add_entering_action(lambda: self.robot.close_left_eye())
+            return mon
+
+        def generate_off_state_right() -> MonitoredState:
+            mon = MonitoredState()
+            mon.add_entering_action(lambda: self.robot.close_right_eye())
+            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
+           
+            return mon
+
+        def generate_on_state_left() -> MonitoredState:
             mon = MonitoredState()
             mon.add_entering_action(lambda: self.robot.open_left_eye())
             mon.add_in_state_action(lambda: self.robot.set_left_eye_color(self.left_color))
             return mon
 
-        def generate_off_state_right() -> MonitoredState:
-            mon = MonitoredState()
-            mon.add_entering_action(lambda: print('eye_off_state_right'))
-            return mon
-
-        def generate_on_state_left() -> MonitoredState:
-            mon = MonitoredState()
-            mon.add_entering_action(lambda: print('eye_on_state_left'))
-            return mon
-
         def generate_on_state_right() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: print('eye_on_state_right'))
+            mon.add_entering_action(lambda: self.robot.open_right_eye())
+            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
+            mon.add_in_state_action(lambda: self.robot.set_right_eye_color(self.right_color))
             return mon
 
         super().__init__(generate_off_state_left, generate_on_state_left, generate_off_state_right,
@@ -245,6 +250,7 @@ class Robot:
             result = self.range_finder.check_integrity() and self.controller.check_integrity()
             return result
         except:
+            print('EXCEPT')
             return False
 
     def set_eye_color(self, color: Tuple):
@@ -308,13 +314,13 @@ class Robot:
                   cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
                   percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
 
-        self.eye_blinkers.blink(side, total_duration, cycle_duration, n_cycles, percent_on, begin_on, end_off)
+        self.eye_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration, n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
 
     def blink_led(self, side: Side, *, total_duration: Optional[Union[float, int]] = None,
                   cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
                   percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
 
-        self.led_blinkers.blink(side, total_duration, cycle_duration, n_cycles, percent_on, begin_on, end_off)
+        self.led_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration, n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
 
     @property
     def movement_direction(self):
