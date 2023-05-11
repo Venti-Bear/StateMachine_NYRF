@@ -122,9 +122,7 @@ class C64Layout(Layout):
         ROBOT_SUCCEED_TO_HOME = ConditionalTransition(HOME, integrity_to_home)
         INTEGRITY_SUCCEEDED.add_transition(ROBOT_SUCCEED_TO_HOME)
 
-        super().__init__()
-
-        self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED})
+        self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED, HOME})
         self.initial_state = ROBOT_INSTANTIATION
 
 
