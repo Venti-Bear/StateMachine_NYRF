@@ -20,19 +20,7 @@ from layout import Layout
 
 class C64Project(FiniteStateMachine):
    def __init__(self):
-        self.__G_TO_Y = 4.0
-        self.__Y_TO_R = 1.0
-        self.__R_TO_G = 5.0
-
-        # Créer les states
-        # Ajouter les actions aux states
-
-        # Créer les transitions
-
-        # Ajouter les transitions aux states
-
         layout = InitializationValidation()
-
         super().__init__(layout)
     
 def main():
