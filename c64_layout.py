@@ -5,8 +5,8 @@ from condition import StateEntryDurationCondition, StateValueCondition
 from Robot import Robot
 from blinker import Side
 
-class InitializationValidation(Layout):
-    def __init__(self):
+class C64Layout(Layout):
+    def __init__(self, exiting_state):
         self.__robot = Robot()
 
         ### VERIFICATION DE L'INSTANTIATION ################################################
@@ -64,6 +64,14 @@ class InitializationValidation(Layout):
         ROBOT_SHUT_DOWN_COMPLETE = ConditionalTransition(END, shut_down_condition)
         SHUT_DOWN_ROBOT.add_transition(ROBOT_SHUT_DOWN_COMPLETE)
 
+        ### GOING HOME #####################################################################
+        HOME = MonitoredState()
+        HOME.add_in_state_action(self.__robot.set_eye_color("yellow"))
+        HOME.add_in_state_action(self.__robot.blink(Side.RIGHT_RECIPROCAL, cycle_duration=1.5, percent_on=0.5))
 
+        # condition et transition pour se rendre a Home
 
+        integrity_to_home = StateEntryDurationCondition(3.0, INTEGRITY_SUCCEEDED)
+        ROBOT_SUCCEED_TO_HOME = ConditionalTransition(HOME, integrity_to_home)
+        INTEGRITY_SUCCEEDED.add_transition(ROBOT_SUCCEED_TO_HOME)
 

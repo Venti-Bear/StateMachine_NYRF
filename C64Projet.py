@@ -14,14 +14,14 @@
 # TASK_2 -> HOME
 # ...
 
-from initialisation_validation import InitializationValidation
+from c64_layout import C64Layout
 
 from finite_state_machine import FiniteStateMachine
 from layout import Layout
 
 class C64Project(FiniteStateMachine):
    def __init__(self):
-        layout = InitializationValidation()
+        layout = C64Layout()
         super().__init__(layout)
     
 def main():
