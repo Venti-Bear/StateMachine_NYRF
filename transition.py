@@ -25,7 +25,7 @@ class Transition(ABC):
 
     """
 
-    __next_state: Optional['State']
+    # __next_state: Optional['State']
 
     def __init__(self, next_state: Optional['State'] = None) -> None:
         """Initializes a Transition object with the given next_state.
@@ -89,7 +89,7 @@ class ConditionalTransition(Transition):
     Attributes:
         __condition (Optional[Condition]): The condition that must be met for the transition to occur.
     """
-    __condition: Optional[Condition]
+    # __condition: Optional[Condition]
 
     def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         """
@@ -170,7 +170,7 @@ class ActionTransition(ConditionalTransition):
     Attributes:
         __transiting_actions (list[Callable[[], None]]): A list of actions triggered upon transitioning.
     """
-    __transiting_actions: list[Callable[[], None]]
+    # __transiting_actions: list[Callable[[], None]]
 
     def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         """
@@ -213,9 +213,9 @@ class MonitoredTransition(ActionTransition):
         __last_transit_time (float): The timestamp of the last transition.
         __transit_count (int): The number of times this transition has been executed.
     """
-    custom_value: Any
-    __last_transit_time: float
-    __transit_count: int
+    # custom_value: Any
+    # __last_transit_time: float
+    # __transit_count: int
 
     def __init__(self, next_state: Optional['State'] = None, condition: Optional[Condition] = None) -> None:
         """

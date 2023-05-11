@@ -32,8 +32,8 @@ class InitializationValidation(Layout):
         # etat d'echec
         INTEGRITY_FAILED = ActionState(Parameters(False, True, True))
         INTEGRITY_FAILED.add_in_state_action(lambda: (print('One or more components are not working')))
-        INTEGRITY_FAILED.add_in_state_action(self.__robot.set_eye_color("red"))
-        INTEGRITY_FAILED.add_in_state_action(self.__robot.blink(Side.BOTH, total_duration=5.0, cycle_duration=0.5, percent_on=0.5))
+        INTEGRITY_FAILED.add_in_state_action(lambda: self.__robot.set_eye_color((100, 0, 0)))
+        INTEGRITY_FAILED.add_in_state_action(lambda: self.__robot.blink(Side.BOTH, total_duration=5.0, cycle_duration=0.5, percent_on=0.5))
 
         # etat de succes
         INTEGRITY_SUCCEEDED = MonitoredState()
@@ -64,6 +64,5 @@ class InitializationValidation(Layout):
         ROBOT_SHUT_DOWN_COMPLETE = ConditionalTransition(END, shut_down_condition)
         SHUT_DOWN_ROBOT.add_transition(ROBOT_SHUT_DOWN_COMPLETE)
 
-
-
-
+        self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, INSTANTIATION_SUCCEEDED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED})
+        self.initial_state = ROBOT_INSTANTIATION

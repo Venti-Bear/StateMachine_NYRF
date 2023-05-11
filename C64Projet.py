@@ -14,9 +14,8 @@
 # TASK_2 -> HOME
 # ...
 
-from initialisation_validation import InitializationValidation
-
 from finite_state_machine import FiniteStateMachine
+from initialisation_validation import InitializationValidation
 from layout import Layout
 
 class C64Project(FiniteStateMachine):
