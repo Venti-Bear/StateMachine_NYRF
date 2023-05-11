@@ -1,0 +1,1 @@
+scp -r jupyter@10.10.10.10:/home/jupyter/C64 .

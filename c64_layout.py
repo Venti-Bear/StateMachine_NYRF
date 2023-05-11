@@ -32,8 +32,8 @@ class C64Layout(Layout):
         # etat d'echec
         INTEGRITY_FAILED = ActionState(Parameters(False, True, True))
         INTEGRITY_FAILED.add_in_state_action(lambda: (print('One or more components are not working')))
-        INTEGRITY_FAILED.add_in_state_action(self.__robot.set_eye_color("red"))
-        INTEGRITY_FAILED.add_in_state_action(self.__robot.blink(Side.BOTH, total_duration=5.0, cycle_duration=0.5, percent_on=0.5))
+        INTEGRITY_FAILED.add_in_state_action(lambda: self.__robot.set_eye_color((100, 0, 0)))
+        INTEGRITY_FAILED.add_in_state_action(lambda: self.__robot.blink(Side.BOTH, total_duration=5.0, cycle_duration=0.5, percent_on=0.5))
 
         # etat de succes
         INTEGRITY_SUCCEEDED = MonitoredState()
@@ -70,8 +70,9 @@ class C64Layout(Layout):
         HOME.add_in_state_action(self.__robot.blink(Side.RIGHT_RECIPROCAL, cycle_duration=1.5, percent_on=0.5))
 
         # condition et transition pour se rendre a Home
-
         integrity_to_home = StateEntryDurationCondition(3.0, INTEGRITY_SUCCEEDED)
         ROBOT_SUCCEED_TO_HOME = ConditionalTransition(HOME, integrity_to_home)
         INTEGRITY_SUCCEEDED.add_transition(ROBOT_SUCCEED_TO_HOME)
 
+        self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED})
+        self.initial_state = ROBOT_INSTANTIATION

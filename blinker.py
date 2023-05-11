@@ -48,18 +48,18 @@ class Blinker(FiniteStateMachine):
     It can also transition between on and off states repeatedly, creating a blinking effect. The Blinker
     can be controlled to turn on, turn off, or blink with customizable settings.
     """
-    __blink_on_cond: StateEntryDurationCondition
-    __blink_stop_on_cond: StateEntryDurationCondition
-    __blink_off_cond: StateEntryDurationCondition
-    __on_duration_cond: StateEntryDurationCondition
-    __off_duration_cond: StateEntryDurationCondition
-    __blink_stop_end: MonitoredState
-    __blink_stop_begin: MonitoredState
-    __blink_begin: MonitoredState
-    __on_duration: MonitoredState
-    __off_duration: MonitoredState
-    __on: MonitoredState
-    __off: MonitoredState
+    # __blink_on_cond: StateEntryDurationCondition
+    # __blink_stop_on_cond: StateEntryDurationCondition
+    # __blink_off_cond: StateEntryDurationCondition
+    # __on_duration_cond: StateEntryDurationCondition
+    # __off_duration_cond: StateEntryDurationCondition
+    # __blink_stop_end: MonitoredState
+    # __blink_stop_begin: MonitoredState
+    # __blink_begin: MonitoredState
+    # __on_duration: MonitoredState
+    # __off_duration: MonitoredState
+    # __on: MonitoredState
+    # __off: MonitoredState
 
     def __init__(self, off_state_generator: Callable[[], MonitoredState],
                  on_state_generator: Callable[[], MonitoredState]) -> None:
@@ -316,8 +316,8 @@ class SideBlinkers:
         __left_blinker (Blinker): The left blinker.
         __right_blinker (Blinker): The right blinker.
     """
-    __left_blinker: Blinker
-    __right_blinker: Blinker
+    # __left_blinker: Blinker
+    # __right_blinker: Blinker
 
     def __init__(self,
                  left_off_state_generator: Callable[[], MonitoredState],

@@ -20,9 +20,9 @@ class Parameters:
         terminal (bool): A boolean indicating whether the state is a terminal state.
     """
 
-    do_in_state_action_when_exiting: bool
-    do_in_state_action_when_entering: bool
-    terminal: bool
+    # do_in_state_action_when_exiting: bool
+    # do_in_state_action_when_entering: bool
+    # terminal: bool
 
     def __init__(self) -> None:
         self.terminal = False
@@ -42,8 +42,8 @@ class State:
         __transition (List[Transition]): The list of transitions available from the
             state.
     """
-    __parameters: Parameters
-    __transition: list['Transition']
+    # __parameters: Parameters
+    # __transition: list['Transition']
 
     def __init__(self, parameters: Parameters = Parameters()) -> None:
         """

@@ -3,8 +3,8 @@ from state import State
 
 
 class Layout:
-    __states: set[State]
-    __initial_state: Optional[State]
+    # __states: set[State]
+    # __initial_state: Optional[State]
 
     def __init__(self) -> None:
         """
