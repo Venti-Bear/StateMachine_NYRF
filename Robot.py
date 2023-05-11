@@ -65,20 +65,17 @@ class EyeBlinkers(SideBlinkers):
         def generate_off_state_right() -> MonitoredState:
             mon = MonitoredState()
             mon.add_entering_action(lambda: self.robot.close_right_eye())
-            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
-           
             return mon
 
         def generate_on_state_left() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: self.robot.open_left_eye())
+            mon.add_in_state_action(lambda: self.robot.open_left_eye())
             mon.add_in_state_action(lambda: self.robot.set_left_eye_color(self.left_color))
             return mon
 
         def generate_on_state_right() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: self.robot.open_right_eye())
-            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
+            mon.add_in_state_action(lambda: self.robot.open_right_eye())
             mon.add_in_state_action(lambda: self.robot.set_right_eye_color(self.right_color))
             return mon
 

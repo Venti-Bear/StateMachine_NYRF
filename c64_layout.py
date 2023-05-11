@@ -5,7 +5,6 @@ from transition import ConditionalTransition
 from condition import StateEntryDurationCondition, StateValueCondition
 from Robot import Robot
 from blinker import Side
-from time import perf_counter
 
 class C64Layout(Layout):
     def __init__(self):
@@ -34,13 +33,13 @@ class C64Layout(Layout):
         # etat d'echec
         INTEGRITY_FAILED = ActionState(Parameters())
         INTEGRITY_FAILED.add_in_state_action(lambda: (print('\rOne or more components are not working', end=' ')))
-        INTEGRITY_FAILED.add_entering_action(lambda: self.__robot.set_eye_color((100, 0, 0)))
+        INTEGRITY_FAILED.add_entering_action(lambda: self.__robot.set_eye_color((50, 0, 0)))
         INTEGRITY_FAILED.add_entering_action(lambda: self.__robot.blink_eye(Side.BOTH, total_duration=5.0, cycle_duration=0.5, percent_on=0.5))
 
         # etat de succes
         INTEGRITY_SUCCEEDED = RobotState(self.__robot)
-        INTEGRITY_SUCCEEDED.add_in_state_action(lambda: (print('\rInitialization successful, starting robot', perf_counter(), end=' ')))
-        INTEGRITY_SUCCEEDED.add_entering_action(lambda: self.__robot.set_eye_color((0, 100, 0)))
+        INTEGRITY_SUCCEEDED.add_in_state_action(lambda: (print('\rInitialization successful, starting robot', end=' ')))
+        INTEGRITY_SUCCEEDED.add_entering_action(lambda: self.__robot.set_eye_color((0, 50, 0)))
         INTEGRITY_SUCCEEDED.add_entering_action(lambda: self.__robot.blink_eye(Side.BOTH, total_duration=3.0, cycle_duration=1.0, percent_on=0.5))
 
         # conditions et transitions
@@ -54,7 +53,7 @@ class C64Layout(Layout):
         ### SHUTDOWN DU ROBOT ##############################################################
         SHUT_DOWN_ROBOT = RobotState(self.__robot)
         SHUT_DOWN_ROBOT.add_in_state_action(lambda: (print("\rShutting down, don't turn off your robot", end=' ')))
-        SHUT_DOWN_ROBOT.add_entering_action(lambda: self.__robot.set_eye_color((100, 100, 0)))
+        SHUT_DOWN_ROBOT.add_entering_action(lambda: self.__robot.set_eye_color((50, 50, 0)))
         SHUT_DOWN_ROBOT.add_entering_action(lambda: self.__robot.blink_eye(Side.LEFT_RECIPROCAL, cycle_duration=0.75, percent_on=0.5))
 
         # etat eteint
@@ -66,10 +65,18 @@ class C64Layout(Layout):
         ROBOT_SHUT_DOWN_COMPLETE = ConditionalTransition(END, shut_down_condition)
         SHUT_DOWN_ROBOT.add_transition(ROBOT_SHUT_DOWN_COMPLETE)
 
+        #TASK_1
+        task_1 = RobotState(self.__robot)
+
         ### GOING HOME #####################################################################
         HOME = RobotState(self.__robot)
-        HOME.add_in_state_action(lambda: self.__robot.set_eye_color((100, 100, 0)))
-        HOME.add_in_state_action(lambda: self.__robot.blink_eye(Side.RIGHT_RECIPROCAL, cycle_duration=1.5, percent_on=0.5))
+        HOME.add_entering_action(lambda: self.__robot.set_eye_color((50, 50, 0)))
+        HOME.add_entering_action(lambda: (print('\nWelcome home!')))
+        HOME.add_entering_action(lambda: self.__robot.blink_eye(Side.RIGHT_RECIPROCAL, cycle_duration=1.5, percent_on=0.5))
+
+        condition = StateEntryDurationCondition(2.0, HOME)
+        cond_transition = ConditionalTransition(task_1, condition)
+        HOME.add_transition(cond_transition)
 
         # condition et transition pour se rendre a Home
         integrity_to_home = StateEntryDurationCondition(3.0, INTEGRITY_SUCCEEDED)
@@ -80,6 +87,3 @@ class C64Layout(Layout):
 
         self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED})
         self.initial_state = ROBOT_INSTANTIATION
-
-
-
