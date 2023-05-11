@@ -5,6 +5,7 @@ from transition import ConditionalTransition, ActionTransition
 from condition import StateEntryDurationCondition, Condition, StateValueCondition, AlwaysTrueCondition
 from Robot import Robot
 from blinker import Side
+from Task01_manual_control import ManualControlState
 
 class C64Layout(Layout):
     def __init__(self):
@@ -80,13 +81,11 @@ class C64Layout(Layout):
         SHUT_DOWN_ROBOT.add_transition(ROBOT_SHUT_DOWN_COMPLETE)
 
         # TASK_1
-        task_1 = RobotState(self.__robot)
+        task_1 = ManualControlState(self.__robot)
 
         taches = [
             task_1
         ]
-
-
 
         ### GOING HOME #####################################################################
         HOME = RobotState(self.__robot)
@@ -115,16 +114,15 @@ class C64Layout(Layout):
         transition.add_transition_action(self.__robot.controller_clear_buffer)
         HOME.add_transition(transition)
 
-        
-
         # condition et transition pour se rendre a Home
         integrity_to_home = StateEntryDurationCondition(3.0, INTEGRITY_SUCCEEDED)
         ROBOT_SUCCEED_TO_HOME = ConditionalTransition(HOME, integrity_to_home)
         INTEGRITY_SUCCEEDED.add_transition(ROBOT_SUCCEED_TO_HOME)
 
+        super().__init__()
+
         self.add_states({ROBOT_INSTANTIATION, INSTANTIATION_FAILED, ROBOT_INTEGRITY, END, INTEGRITY_FAILED, INTEGRITY_SUCCEEDED, HOME})
         self.initial_state = ROBOT_INSTANTIATION
-
 
 
 class ControllerCondition(Condition):

@@ -141,6 +141,18 @@ class Controller:
         print(self.__input_buffer[-1], self.__input_buffer)
         return self.__input_buffer[-1]
 
+    def peek_char(self) -> Optional[str]:
+        if not self.__input_buffer:
+            return None
+
+        print(self.__input_buffer[0], self.__input_buffer)
+        return self.__input_buffer[0]
+
+    def current_char(self) -> Optional[str]:
+        if self.last_char == self.peek_last_char():
+            return self.last_char
+        return None
+
     def check_integrity(self):
         return self.robot is not None
 
@@ -240,6 +252,7 @@ class Robot:
                     self.led_blinkers = LedBlinkers(self.robot)
                     self.eye_blinkers = EyeBlinkers(self.robot)
                     self.motor = Motor(self.robot)
+                    self.motor.direction = None
                     return True
                 else:
                     return False
@@ -360,3 +373,9 @@ class Robot:
 
     def controller_peek_last_char(self) -> Optional[str]:
         return self.controller.peek_last_char()
+
+    def controller_peek_char(self) -> Optional[str]:
+        return self.controller.peek_char()
+    
+    def controller_current_char(self) -> Optional[str]:
+        return self.controller.current_char()
