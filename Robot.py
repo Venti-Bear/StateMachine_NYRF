@@ -16,7 +16,7 @@
 
 from easygopigo3 import EasyGoPiGo3 as GoPiGo3
 from enum import Enum, auto
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 from time import perf_counter
 
 from blinker import SideBlinkers, Side
@@ -65,20 +65,17 @@ class EyeBlinkers(SideBlinkers):
         def generate_off_state_right() -> MonitoredState:
             mon = MonitoredState()
             mon.add_entering_action(lambda: self.robot.close_right_eye())
-            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
-           
             return mon
 
         def generate_on_state_left() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: self.robot.open_left_eye())
+            mon.add_in_state_action(lambda: self.robot.open_left_eye())
             mon.add_in_state_action(lambda: self.robot.set_left_eye_color(self.left_color))
             return mon
 
         def generate_on_state_right() -> MonitoredState:
             mon = MonitoredState()
-            mon.add_entering_action(lambda: self.robot.open_right_eye())
-            mon.add_entering_action(lambda: print("\rtourlou les toulouses", perf_counter(), end='                                 '))
+            mon.add_in_state_action(lambda: self.robot.open_right_eye())
             mon.add_in_state_action(lambda: self.robot.set_right_eye_color(self.right_color))
             return mon
 
@@ -114,23 +111,35 @@ class Controller:
         self.keycode = ['', 'up', 'left', 'ok', 'right', 'down', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0',
                         '#']
         self.last_char = ''
-        self.input_buffer = []
+        self.__input_buffer = []
+
+    @property
+    def buffer(self):
+        return self.__input_buffer[:]  # retourne une copie du buffer pour empecher les modifications accidentelles
 
     def track(self):
         char_num: int = self.remote.read()
         char = self.keycode[char_num]
         if char != "" and char != self.last_char:
-            self.input_buffer.append(char)
+            self.__input_buffer.append(char)
         self.last_char = char
 
     def clear_buffer(self):
-        self.input_buffer = []
+        print("clear")
+        self.__input_buffer = []
 
     def next_char(self) -> Optional[str]:
-        if not self.input_buffer:
+        if not self.__input_buffer:
             return None
 
-        return self.input_buffer.pop()
+        return self.__input_buffer.pop(0)
+
+    def peek_last_char(self) -> Optional[str]:
+        if not self.__input_buffer:
+            return None
+
+        print(self.__input_buffer[-1], self.__input_buffer)
+        return self.__input_buffer[-1]
 
     def check_integrity(self):
         return self.robot is not None
@@ -226,23 +235,21 @@ class Robot:
         try:
             if self.robot is None:
                 self.robot = GoPiGo3()
-            return self.robot is not None
+
+                if self.robot is not None:
+                    self.led_blinkers = LedBlinkers(self.robot)
+                    self.eye_blinkers = EyeBlinkers(self.robot)
+                    self.motor = Motor(self.robot)
+                    return True
+                else:
+                    return False
         except:
             return False
 
     def check_integrity(self):
         try:
-            if self.led_blinkers is None:
-                self.led_blinkers = LedBlinkers(self.robot)
-
-            if self.eye_blinkers is None:
-                self.eye_blinkers = EyeBlinkers(self.robot)
-
             if self.controller is None:
                 self.controller = Controller(self.robot)
-
-            if self.motor is None:
-                self.motor = Motor(self.robot)
 
             if self.range_finder is None:
                 self.range_finder = RangeFinder(self.robot)
@@ -250,7 +257,6 @@ class Robot:
             result = self.range_finder.check_integrity() and self.controller.check_integrity()
             return result
         except:
-            print('EXCEPT')
             return False
 
     def set_eye_color(self, color: Tuple):
@@ -329,3 +335,28 @@ class Robot:
     @movement_direction.setter
     def movement_direction(self, direction: Direction):
         self.motor.direction = direction
+
+    def shut_down(self):
+        # On remet les actuateurs à leur état initiale
+        self.motor.direction = None
+        self.turn_eye_off(Side.BOTH)
+        self.turn_led_off(Side.BOTH)
+        # On "ferme" les sensor externe
+        self.controller = None
+        self.range_finder = None
+        # On "éteint" le robot
+        del self 
+
+    @property
+    def controller_buffer(self) -> List:
+        return self.controller.buffer
+
+    def controller_clear_buffer(self) -> None:
+        print("clear -1")
+        self.controller.clear_buffer()
+
+    def controller_next_char(self) -> Optional[str]:
+        return self.controller.next_char()
+
+    def controller_peek_last_char(self) -> Optional[str]:
+        return self.controller.peek_last_char()
