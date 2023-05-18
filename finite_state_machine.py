@@ -104,6 +104,9 @@ class FiniteStateMachine:
         Returns:
             bool: True if the state machine has not reached a terminal state, and False otherwise.
         """
+        if self.__current_operational_state == OperationalState.UNINITIALIZED:
+            raise RuntimeError("The finite state machine is UNINITIALIZED. You cannot track an UNINITIALIZED state machine")
+
         if self.current_applicative_state.is_terminal:
             self.__current_operational_state = OperationalState.TERMINAL_REACHED
             return False

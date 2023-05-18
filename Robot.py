@@ -1,19 +1,3 @@
-# INITIALISATION ET VALIDATION
-# ============================
-# ROBOT_INSTANTIATION -> ROBOT_INTEGRITY if successful else INSTANTIATION_FAILED -> END
-# ROBOT_INTEGRITY -> INTEGRITY SUCCEEDED if successful else INTEGRITY_FAILED -> SHUT_DOWN_ROBOT -> END
-# INTEGRITY_SUCCEEDED -> HOME 
-
-# ACCUEIL
-# ============================
-# HOME - TACHES (TASK_1, TASK_2, TASK_3, ...)
-
-# TACHE
-# ============================
-# TASK_1 -> HOME
-# TASK_2 -> HOME
-# ...
-
 from easygopigo3 import EasyGoPiGo3 as GoPiGo3
 from enum import Enum, auto
 from typing import Optional, Tuple, Union, List
@@ -137,14 +121,12 @@ class Controller:
         if not self.__input_buffer:
             return None
 
-        print(self.__input_buffer[-1], self.__input_buffer)
         return self.__input_buffer[-1]
 
     def peek_char(self) -> Optional[str]:
         if not self.__input_buffer:
             return None
 
-        print(self.__input_buffer[0], self.__input_buffer)
         return self.__input_buffer[0]
 
     def current_char(self) -> Optional[str]:
@@ -187,7 +169,7 @@ class Motor:
         elif direction == Direction.RIGHT:
             self.robot.right()
         else:
-            self.__stop()
+            self.robot.stop()
 
 
 class RangeFinder:
@@ -204,7 +186,7 @@ class RangeFinder:
 
     @property
     def distance_cm(self):
-        dist = self.sensor.read_cm()
+        dist = self.sensor.read()
         if dist > 230:
             return None
         return dist
@@ -221,9 +203,11 @@ class Robot:
         self.motor = None
         self.controller = None
         self.range_finder = None
+        self.__integrity = False
 
     def track(self) -> None:
-        self.controller.track()
+        if self.__integrity:
+            self.controller.track()
         self.eye_blinkers.track()
         self.led_blinkers.track()
 
@@ -236,7 +220,7 @@ class Robot:
                     self.led_blinkers = LedBlinkers(self.robot)
                     self.eye_blinkers = EyeBlinkers(self.robot)
                     self.motor = Motor(self.robot)
-                    self.motor.direction = None
+                    self.reset_actuator()
                     return True
                 else:
                     return False
@@ -251,8 +235,8 @@ class Robot:
             if self.range_finder is None:
                 self.range_finder = RangeFinder(self.robot)
 
-            result = self.range_finder.check_integrity() and self.controller.check_integrity()
-            return result
+            self.__integrity = self.range_finder.check_integrity() and self.controller.check_integrity()
+            return self.__integrity
         except:
             return False
 
@@ -281,7 +265,12 @@ class Robot:
 
     @property
     def distance_cm(self):
-        return self.range_finder.distance_cm()
+        result = self.range_finder.distance_cm
+        if result is not None:
+            return result
+        else:
+            return 3000
+
 
     def get_next_controller_input(self):
         return self.controller.next_char()
@@ -334,11 +323,7 @@ class Robot:
         self.motor.direction = direction
 
     def shut_down(self):
-        # On remet les actuateurs à leur état initiale
-        self.motor.direction = None
-        self.turn_eye_off(Side.BOTH)
-        self.turn_led_off(Side.BOTH)
-        # On "ferme" les sensor externe
+        self.reset_actuator()
         self.controller = None
         self.range_finder = None
         # On "éteint" le robot
@@ -362,3 +347,8 @@ class Robot:
     
     def controller_current_char(self) -> Optional[str]:
         return self.controller.current_char()
+
+    def reset_actuator(self):
+        self.motor.direction = None
+        self.turn_eye_off(Side.BOTH)
+        self.turn_led_off(Side.BOTH)
