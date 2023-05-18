@@ -125,7 +125,6 @@ class Controller:
         self.last_char = char
 
     def clear_buffer(self):
-        print("clear")
         self.__input_buffer = []
 
     def next_char(self) -> Optional[str]:
@@ -180,30 +179,15 @@ class Motor:
     def direction(self, direction: Optional[Direction]):
         self.__current_direction = direction
         if direction == Direction.FORWARD:
-            self.__go_forward()
+            self.robot.forward()
         elif direction == Direction.BACKWARD:
-            self.__go_backward()
+            self.robot.backward()
         elif direction == Direction.LEFT:
-            self.__turn_left()
+            self.robot.left()
         elif direction == Direction.RIGHT:
-            self.__turn_right()
+            self.robot.right()
         else:
             self.__stop()
-
-    def __go_forward(self):
-        self.robot.forward()
-
-    def __go_backward(self):
-        self.robot.backward()
-
-    def __stop(self):
-        self.robot.stop()
-
-    def __turn_right(self):
-        self.robot.right()
-
-    def __turn_left(self):
-        self.robot.left()
 
 
 class RangeFinder:
@@ -365,7 +349,6 @@ class Robot:
         return self.controller.buffer
 
     def controller_clear_buffer(self) -> None:
-        print("clear -1")
         self.controller.clear_buffer()
 
     def controller_next_char(self) -> Optional[str]:
