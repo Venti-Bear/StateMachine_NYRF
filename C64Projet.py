@@ -1,4 +1,4 @@
-from finite_state_machine import FiniteStateMachine
+from lib.finite_state_machine import FiniteStateMachine
 from c64_layout import C64Layout
 
 class C64Project(FiniteStateMachine):

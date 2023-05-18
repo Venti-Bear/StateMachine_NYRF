@@ -3,8 +3,8 @@ from enum import Enum, auto
 from typing import Optional, Tuple, Union, List
 from time import perf_counter
 
-from blinker import SideBlinkers, Side
-from state import MonitoredState
+from lib.blinker import SideBlinkers, Side
+from lib.state import MonitoredState
 
 
 class LedBlinkers(SideBlinkers):
@@ -176,6 +176,7 @@ class RangeFinder:
     def __init__(self, robot: GoPiGo3):
         self.robot = robot
         self.sensor = self.robot.init_distance_sensor()
+        self.servo = self.robot.init_servo(port='SERVO2')
 
     @property
     def distance_mm(self):

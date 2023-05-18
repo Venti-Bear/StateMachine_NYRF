@@ -1,9 +1,9 @@
-from state import *
-from layout import Layout
-from transition import ConditionalTransition
-from condition import StateEntryDurationCondition
+from lib.state import *
+from lib.layout import Layout
+from lib.transition import ConditionalTransition
+from lib.condition import StateEntryDurationCondition
 from Robot import Robot
-from blinker import Side
+from lib.blinker import Side
 
 class InitializationValidation(Layout):
     def __init__(self):
@@ -25,8 +25,8 @@ class InitializationValidation(Layout):
         param.do_in_state_action_when_entering = True
         param.do_in_state_action_when_exiting = True
 
-        END = ActionState(param)
-        END.add_in_state_action(lambda: (print("Robot shutting down")))
+        end = ActionState(param)
+        end.add_in_state_action(lambda: (print("Robot shutting down")))
         
         integrity_failed = ActionState(param)
         integrity_failed.add_in_state_action(lambda: (print('One or more components are not working')))
@@ -40,5 +40,5 @@ class InitializationValidation(Layout):
         
         super().__init__()
 
-        self.add_states({robot_instantiation, instantiation_failed, instantiation_succeeded, robot_integrity, END, integrity_failed, integrity_succeeded})
+        self.add_states({robot_instantiation, instantiation_failed, instantiation_succeeded, robot_integrity, end, integrity_failed, integrity_succeeded})
         self.initial_state = robot_instantiation

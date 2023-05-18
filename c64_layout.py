@@ -1,11 +1,11 @@
 from Task02_crash_avoidance import CrashAvoidanceState
-from state import *
+from lib.state import *
 from robot_state import RobotState
-from layout import Layout
-from transition import ConditionalTransition, ActionTransition
-from condition import StateEntryDurationCondition, Condition, StateValueCondition, AlwaysTrueCondition
+from lib.layout import Layout
+from lib.transition import ConditionalTransition, ActionTransition
+from lib.condition import StateEntryDurationCondition, Condition, StateValueCondition, AlwaysTrueCondition
 from Robot import Robot
-from blinker import Side
+from lib.blinker import Side
 from Task01_manual_control import ManualControlState
 
 class C64Layout(Layout):

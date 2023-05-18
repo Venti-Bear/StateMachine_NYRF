@@ -1,10 +1,10 @@
-from blinker import Side
-from state import MonitoredState
-from transition import ConditionalTransition
-from condition import StateValueCondition
-from finite_state_machine import FiniteStateMachine
+from lib.blinker import Side
+from lib.state import MonitoredState
+from lib.transition import ConditionalTransition
+from lib.condition import StateValueCondition
+from lib.finite_state_machine import FiniteStateMachine
 from robot_state import RobotState
-from layout import Layout
+from lib.layout import Layout
 from Robot import Robot, Direction
 
 
