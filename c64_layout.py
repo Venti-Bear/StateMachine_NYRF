@@ -141,7 +141,6 @@ class ControllerCondition(Condition):
         if self.__robot.controller_peek_last_char() == "ok":
             buffer = self.__robot.controller_buffer[:-1]
             if self.__texte is None:
-                print(self.__texte is None)
                 return True
             else:
                 if ''.join(buffer) == self.__texte:

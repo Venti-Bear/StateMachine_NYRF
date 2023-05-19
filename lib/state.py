@@ -97,7 +97,7 @@ class State:
         Args:
             transition (Transition): The transition to add.
         """
-        from transition import Transition
+        from lib.transition import Transition
         if not isinstance(transition, Transition):
             raise TypeError("transition must be a Transition object")
 

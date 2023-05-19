@@ -1,9 +1,9 @@
 from typing import Optional
 
-from layout import Layout
-from operational_state import OperationalState
-from state import State
-from transition import Transition
+from lib.operational_state import OperationalState
+from lib.layout import Layout
+from lib.state import State
+from lib.transition import Transition
 
 from time import perf_counter
 

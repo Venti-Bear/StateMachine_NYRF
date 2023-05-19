@@ -192,7 +192,7 @@ class MonitoredStateCondition(Condition, ABC):
     # _monitored_state: 'MonitoredState'
 
     def __init__(self, monitored_state: 'MonitoredState', inverse: bool = False) -> None:
-        from state import MonitoredState
+        from lib.state import MonitoredState
         """
         Initializes a new instance of MonitoredStateCondition.
 
@@ -296,6 +296,7 @@ class StateEntryDurationCondition(MonitoredStateCondition):
         Returns:
         - A bool indicating whether the condition is met.
         """
+        t = time.perf_counter() - self._monitored_state.last_entry_time
         return self.__duration < time.perf_counter() - self._monitored_state.last_entry_time
 
 

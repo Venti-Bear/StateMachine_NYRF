@@ -27,7 +27,7 @@ class LedBlinkers(SideBlinkers):
             return mon
 
         def generate_on_state_right() -> MonitoredState:
-            mon = MonitoredState()            
+            mon = MonitoredState()
             mon.add_entering_action(lambda: self.robot.led_on('right'))
             return mon
 
@@ -54,13 +54,15 @@ class EyeBlinkers(SideBlinkers):
         def generate_on_state_left() -> MonitoredState:
             mon = MonitoredState()
             mon.add_in_state_action(lambda: self.robot.open_left_eye())
-            mon.add_in_state_action(lambda: self.robot.set_left_eye_color(self.left_color))
+            mon.add_in_state_action(
+                lambda: self.robot.set_left_eye_color(self.left_color))
             return mon
 
         def generate_on_state_right() -> MonitoredState:
             mon = MonitoredState()
             mon.add_in_state_action(lambda: self.robot.open_right_eye())
-            mon.add_in_state_action(lambda: self.robot.set_right_eye_color(self.right_color))
+            mon.add_in_state_action(
+                lambda: self.robot.set_right_eye_color(self.right_color))
             return mon
 
         super().__init__(generate_off_state_left, generate_on_state_left, generate_off_state_right,
@@ -99,7 +101,8 @@ class Controller:
 
     @property
     def buffer(self):
-        return self.__input_buffer[:]  # retourne une copie du buffer pour empecher les modifications accidentelles
+        # retourne une copie du buffer pour empecher les modifications accidentelles
+        return self.__input_buffer[:]
 
     def track(self):
         char_num: int = self.remote.read()
@@ -173,27 +176,60 @@ class Motor:
 
 
 class RangeFinder:
-    def __init__(self, robot: GoPiGo3):
+    __MAX_ANGLE = 20
+    __MIN_ANGLE = -20
+
+    def __init__(self, robot: GoPiGo3, bias: int = 0):
         self.robot = robot
-        self.sensor = self.robot.init_distance_sensor()
-        self.servo = self.robot.init_servo(port='SERVO2')
+        self.__sensor = self.robot.init_distance_sensor()
+        self.__servo = self.robot.init_servo(port='SERVO2')
+        self.__bias = bias
 
     @property
     def distance_mm(self):
-        dist = self.sensor.read_mm()
+        dist = self.__sensor.read_mm()
         if dist > 2300:
             return None
         return dist
 
     @property
     def distance_cm(self):
-        dist = self.sensor.read()
+        dist = self.__sensor.read()
         if dist > 230:
             return None
         return dist
 
+    @property
+    def bias(self):
+        return self.__bias
+
+    @bias.setter
+    def bias(self, value):
+        if abs(value) > 10:
+            return
+
+        self.__bias = value
+
+    @property
+    def angle(self):
+        return self.__angle
+
+    @angle.setter
+    def angle(self, angle):
+        self.__angle = min(max(angle, RangeFinder.__MIN_ANGLE), RangeFinder.__MAX_ANGLE)
+        self.__angle = max(self.__angle, RangeFinder.__MIN_ANGLE)
+        self.__angle = min(self.__angle, RangeFinder.__MAX_ANGLE)
+        self.__update_pos()
+
+    def __update_pos(self):
+        self.__servo.rotate_servo(self.__raw_angle)
+
+    @property
+    def __raw_angle(self):
+        return (self.angle * -1) + 90 + self.bias
+
     def check_integrity(self):
-        return self.sensor is not None
+        return self.__sensor is not None and self.__servo is not None
 
 
 class Robot:
@@ -236,7 +272,8 @@ class Robot:
             if self.range_finder is None:
                 self.range_finder = RangeFinder(self.robot)
 
-            self.__integrity = self.range_finder.check_integrity() and self.controller.check_integrity()
+            self.__integrity = self.range_finder.check_integrity(
+            ) and self.controller.check_integrity()
             return self.__integrity
         except:
             return False
@@ -272,7 +309,6 @@ class Robot:
         else:
             return 3000
 
-
     def get_next_controller_input(self):
         return self.controller.next_char()
 
@@ -307,13 +343,15 @@ class Robot:
                   cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
                   percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
 
-        self.eye_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration, n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
+        self.eye_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration,
+                                n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
 
     def blink_led(self, side: Side, *, total_duration: Optional[Union[float, int]] = None,
                   cycle_duration: Optional[Union[float, int]] = None, n_cycles: Optional[int] = None,
                   percent_on: Union[float, int] = 0.5, begin_on: bool = True, end_off: bool = True) -> None:
 
-        self.led_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration, n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
+        self.led_blinkers.blink(side, total_duration=total_duration, cycle_duration=cycle_duration,
+                                n_cycles=n_cycles, percent_on=percent_on, begin_on=begin_on, end_off=end_off)
 
     @property
     def movement_direction(self):
@@ -325,10 +363,11 @@ class Robot:
 
     def shut_down(self):
         self.reset_actuator()
+        self.range_finder_angle = 0
         self.controller = None
         self.range_finder = None
         # On "éteint" le robot
-        del self 
+        del self
 
     @property
     def controller_buffer(self) -> List:
@@ -345,9 +384,17 @@ class Robot:
 
     def controller_peek_char(self) -> Optional[str]:
         return self.controller.peek_char()
-    
+
     def controller_current_char(self) -> Optional[str]:
         return self.controller.current_char()
+
+    @property
+    def range_finder_angle(self) -> int:
+        return self.range_finder.angle
+
+    @range_finder_angle.setter
+    def range_finder_angle(self, angle: int) -> None:
+        self.range_finder.angle = angle
 
     def reset_actuator(self):
         self.motor.direction = None

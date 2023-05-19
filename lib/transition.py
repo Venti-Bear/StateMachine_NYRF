@@ -3,10 +3,10 @@ import abc
 import time
 from typing import Callable, Optional, List, Any, TYPE_CHECKING
 
-from condition import Condition
+from lib.condition import Condition
 
 if TYPE_CHECKING:
-    from state import State
+    from lib.state import State
 
 NoneType = type(None)
 
@@ -38,7 +38,7 @@ class Transition(ABC):
 
         """
 
-        from state import State
+        from lib.state import State
         if not isinstance(next_state, State) and next_state is not None:
             raise TypeError('next_state must be of type State')
 
