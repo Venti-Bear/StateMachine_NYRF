@@ -2,10 +2,10 @@
 
 # Noms
 
-Fabien Juteau Desjardins
-Yoan Poulin Truchon
-Raphaël Lavoie
-Nicolas Drolet
+- Fabien Juteau Desjardins
+- Yoan Poulin Truchon
+- Raphaël Lavoie
+- Nicolas Drolet
 
 # Pourcentage fait
 
